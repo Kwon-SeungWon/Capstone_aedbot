@@ -1,0 +1,4 @@
+aedbot_imu_node:
+  ros__parameters:
+    port: /dev/ttyIMU
+    baudrate: 115200

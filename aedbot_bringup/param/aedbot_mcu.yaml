@@ -1,0 +1,23 @@
+aedbot_mcu_node:
+  ros__parameters:
+    port:
+      name: "/dev/ttyMotor"
+      baudrate: 115200
+
+    wheel:
+      separation: 0.591
+      radius: 0.11
+
+    motor:
+      gear_ratio: 15
+      max_lin_vel_x: 1.2
+      max_rot_vel_z: 1.0
+      
+    sensor:
+      enc_pulse: 1000.0
+
+diff_drive_controller:
+  ros__parameters:
+    odometry:
+      frame_id: "odom"
+      child_frame_id: "base_footprint"
