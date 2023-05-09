@@ -154,7 +154,7 @@ local_costmap:
         infation_radius: 1.0 #0.55   
         
         # cell의 코스트에 반비례
-        cost_scaling_factor: 20.0 #5.0
+        cost_scaling_factor: 10.0 #5.0
 
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
@@ -239,7 +239,7 @@ global_costmap:
         infation_radius: 1.0 #1.75     #터틀봇: 1.0
         
         # cell의 코스트에 반비례
-        cost_scaling_factor: 20.0 #2.58   #터틀봇: 0.55
+        cost_scaling_factor: 10.0 #2.58   #터틀봇: 0.55
 
       always_send_full_costmap: True
   global_costmap_client:
@@ -254,7 +254,7 @@ map_server:
     use_sim_time: False
 
     ##################추후 변경######################
-    yaml_filename: "map_112_0504.yaml" 
+    yaml_filename: "map_112_0510.yaml" 
 
 map_saver:
   ros__parameters:
