@@ -33,20 +33,20 @@ include_directories(
 #  "srv/FallDetectionToNav2.srv"
 #)
 
-set(DEPENDENCIES
-  "geometry_msgs"
-  "message_filters"
-  "nav_msgs"
-  "rclcpp"
-  "rcutils"
-  "sensor_msgs"
-  "std_msgs"
-  "std_srvs"
-  "tf2"
-  "tf2_ros"
-  "aedbot_interfaces"
-  "builtin_interfaces"
-)
+# set(DEPENDENCIES
+#   "geometry_msgs"
+#   "message_filters"
+#   "nav_msgs"
+#   "rclcpp"
+#   "rcutils"
+#   "sensor_msgs"
+#   "std_msgs"
+#   "std_srvs"
+#   "tf2"
+#   "tf2_ros"
+#   "aedbot_interfaces"
+#   "builtin_interfaces"
+#)
 
 ####################
 ### ADD C++ FILE ###

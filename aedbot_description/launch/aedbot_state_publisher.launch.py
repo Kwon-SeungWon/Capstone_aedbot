@@ -15,7 +15,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    urdf_file_name = 'aedbot.urdf'
+    urdf_file_name = 'aedbot.urdf.xml'
 
     urdf = os.path.join(
         get_package_share_directory('aedbot_description'),
