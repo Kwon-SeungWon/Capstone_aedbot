@@ -20,14 +20,14 @@ find_package(builtin_interfaces REQUIRED)
 find_package(aedbot_interfaces REQUIRED)
 #find_package(rosidl_default_generators REQUIRED)
 
-#rosidl_generate_interfaces(${PROJECT_NAME}
-#  "srv/Battery.srv"
-#  "srv/Calg.srv"
-#  "srv/Color.srv"
-#  "srv/Onoff.srv"
-#  "srv/ResetOdom.srv"
-#  "srv/SaveColor.srv"
-#)
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "srv/Battery.srv"
+  "srv/Calg.srv"
+  "srv/Color.srv"
+  "srv/Onoff.srv"
+  "srv/ResetOdom.srv"
+  "srv/SaveColor.srv"
+)
 ################################################################################
 # Install
 ################################################################################

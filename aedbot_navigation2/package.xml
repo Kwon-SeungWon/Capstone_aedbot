@@ -11,8 +11,26 @@
   <maintainer email="bishopearson@gmail.com">Bishop Pearson</maintainer>
   <author email="bishopearson@gmail.com">Bishop Pearson</author>
   <buildtool_depend>ament_cmake</buildtool_depend>
+  
   <exec_depend>nav2_bringup</exec_depend>
+  <build_depend>rosidl_default_generators</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav2_msgs</exec_depend>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>message_filters</depend>
+  
+  <depend>aedbot_interfaces</depend>
+  <depend>python3-transforms3d</depend>
+  <depend>python3-serial</depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
+    <!-- <build_type>ament_python</build_type> -->
   </export>
 </package>

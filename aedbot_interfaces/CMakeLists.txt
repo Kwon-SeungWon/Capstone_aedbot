@@ -27,6 +27,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/ResetOdom.srv"
   "srv/SaveColor.srv"
   "srv/Set.srv"
+  "srv/FallDetectionToNav2.srv"
 )
 
 if(BUILD_TESTING)
