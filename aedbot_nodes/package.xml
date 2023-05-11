@@ -2,17 +2,36 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>aedbot_nodes</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="ksw7384@hanyang.ac.kr">root</maintainer>
-  <license>TODO: License declaration</license>
-
+  <version>0.0.1</version>
+  <description>
+    ROS 2 launch scripts for nodes
+  </description> 
+  <license>Apache 2.0</license>
+  <url type="repository">https://github.com/bishopearson/aedbot</url>
+  <maintainer email="bishopearson@gmail.com">Bishop Pearson</maintainer>
+  <author email="bishopearson@gmail.com">Bishop Pearson</author>
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
 
+  <exec_depend>nav2_bringup</exec_depend>
+  <!-- <build_depend>rosidl_default_generators</build_depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group> -->
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav2_msgs</exec_depend>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>message_filters</depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <depend>aedbot_interfaces</depend>
+  <depend>python3-transforms3d</depend>
+  <depend>python3-serial</depend>
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
+    <!-- <build_type>ament_python</build_type> -->
   </export>
 </package>
