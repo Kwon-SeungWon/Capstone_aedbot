@@ -1,25 +1,82 @@
+################################################################################
+# Set minimum required version of cmake, project name and compile options
+################################################################################
 cmake_minimum_required(VERSION 3.5)
 project(aedbot_nodes)
 
-# Default to C99
-if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif()
-
-# Default to C++14
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
-
-# find dependencies
+################################################################################
+# Find ament packages and libraries for ament and system dependencies
+################################################################################
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
+find_package(aedbot_interfaces REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(message_filters REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(action_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
+####################
+###### BUILD #######
+####################
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+)
+
+#rosidl_generate_interfaces(${PROJECT_NAME}
+#  "srv/FallDetectionToNav2.srv"
+#)
+
+# set(DEPENDENCIES
+#   "geometry_msgs"
+#   "message_filters"
+#   "nav_msgs"
+#   "rclcpp"
+#   "rcutils"
+#   "sensor_msgs"
+#   "std_msgs"
+#   "std_srvs"
+#   "tf2"
+#   "tf2_ros"
+#   "aedbot_interfaces"
+#   "builtin_interfaces"
+#)
+
+####################
+### ADD C++ FILE ###
+####################
+#target_include_directories(program PUBLIC ${CMAKE_SOURCE_DIR}/includes)
+
+#add_executable(to_goal src/go_to_goal.cpp)
+
+#target_include_directories(to_goal PUBLIC ${CMAKE_SOURCE_DIR}/includes)
+#target_link_libraries(to_goal ${catkin_LIBRARIES})
+
+#ament_target_dependencies(to_goal
+#  ${DEPENDENCIES} aedbot_interfaces)   
+
+################################################################################
+# Install
+################################################################################
+
+# Install Python modules
+#ament_python_install_package(${PROJECT_NAME})
+
+# Install Python executables
+install(PROGRAMS
+  src/get_dest.py
+  src/test_sub.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -32,4 +89,7 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+################################################################################
+# Macro for ament package
+################################################################################
 ament_package()
