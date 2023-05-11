@@ -15,7 +15,6 @@ import serial
 import time
 import math
 
-
 class IahrsDriver(Node):
     CONF_SYNC_LIN_ACC = 0x0004  # 센서 좌표계 가속도 (g)
     CONF_SYNC_ANG_VEL = 0x0008  # 센서 좌표계 각속도 (deg/s)

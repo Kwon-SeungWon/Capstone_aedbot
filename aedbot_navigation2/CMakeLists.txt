@@ -8,13 +8,16 @@ project(aedbot_navigation2)
 # Find ament packages and libraries for ament and system dependencies
 ################################################################################
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(aedbot_interfaces REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(message_filters REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(action_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(tf2 REQUIRED)
@@ -65,18 +68,41 @@ include_directories(
 # Install
 ################################################################################
 install(
-  DIRECTORY launch map param rviz
+  DIRECTORY launch map param rviz scripts
   DESTINATION share/${PROJECT_NAME}
 )
 
-#install(DIRECTORY include/${PROJECT_NAME}/
-#  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-#)
+# Install Python modules
+#ament_python_install_package(${PROJECT_NAME})
 
-#install(TARGETS
-#  to_goal
-#  DESTINATION share/${PROJECT_NAME}
-#)
+# Install Python executables
+install(PROGRAMS
+  #scripts/run_inspection.py
+  #scripts/lift_controller.py
+  #scripts/nav_to_pose.py
+  #scripts/nav_through_poses.py
+  #scripts/pick_and_deliver.py
+  scripts/robot_navigator.py
+  scripts/go_to_goal.py
+  #scripts/security_demo.py
+  #scripts/waypoint_follower.py
+  #scripts/battery_state/battery_state_pub.py
+  #scripts/navigate_to_charging_dock.py
+  #scripts/navigate_to_charging_dock_v2.py
+  #scripts/transforms/map_to_base_link_transform.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # uncomment the line when a copyright and license is not present in all source files
+  #set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # uncomment the line when this package is not in a git repo
+  #set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ################################################################################
 # Macro for ament package

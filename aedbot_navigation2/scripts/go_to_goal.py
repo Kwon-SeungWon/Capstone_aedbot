@@ -21,7 +21,6 @@ class GotoGoal(Node):
         self.srv = self.create_service(
             FallDetectionToNav2, "dest_val", self.dest_val_callback
         )
-        self.go_to_destination()
 
     def dest_val_callback(self, destination, location):
         goal_poses = []
@@ -43,6 +42,8 @@ class GotoGoal(Node):
             )
         )
         location = "사고 발생지점 수신완료"
+        
+        self.go_to_destination()
 
         return location
 
@@ -76,6 +77,10 @@ class GotoGoal(Node):
 
         # You may use the navigator to clear or obtain costmaps
         #####################################################
+        
+        # 주기적으로 local, global costmap clear (5s 마다)
+        navigator.clear_periodically_costmap()
+        
         navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
         # global_costmap = navigator.getGlobalCostmap()
         # local_costmap = navigator.getLocalCostmap()
