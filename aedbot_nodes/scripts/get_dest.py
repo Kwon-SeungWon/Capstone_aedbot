@@ -31,11 +31,13 @@ class MinimalPublisher(Node):
         msg.dest_w = w
 
         self.publisher_.publish(msg)
-        self.get_logger().info(f"I pub: {msg.x}, {msg.y}, {msg.z}, {msg.w}")
+        # self.get_logger().info(
+        #     f"I pub: {msg.dest_x}, {msg.dest_y}, {msg.dest_z}, {msg.dest_w}"
+        # )
 
 
-def main(args=None):
-    rclpy.init(args=args)
+def main():
+    rclpy.init()
 
     minimal_publisher = MinimalPublisher()
 

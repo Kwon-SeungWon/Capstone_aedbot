@@ -39,7 +39,7 @@ class ImuSubscriberNode(Node):
         self.get_logger().info("self.k:%s" % type(self.k))
         self.get_logger().info("self.k:%s" % self.k)
 
-        if self.k == 0x7F123D69F900:
+        if self.k == True:
             # publish_msg = Int32()
             mean_count_state = Int32()
             # mean_count_state.data = self.k
