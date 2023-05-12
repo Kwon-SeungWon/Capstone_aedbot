@@ -2,8 +2,9 @@
 
 import rclpy
 from rclpy.node import Node
+from std_msgs.msg import String
 
-from aedbot_interfaces.srv import FallDetectionToNav2
+# from aedbot_interfaces.srv import FallDetectionToNav2
 
 
 def get_dest():
@@ -14,24 +15,19 @@ def get_dest():
 class MinimalPublisher(Node):
     def __init__(self):
         super().__init__("get_dest")
-        self.publisher_ = self.create_publisher(
-            FallDetectionToNav2, "dest_val", 10
-        )  # CHANGE
+        self.publisher_ = self.create_publisher(String, "dest_val", 10)  # CHANGE
         timer_period = 0.5
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.i = 0
 
     def timer_callback(self):
-        msg = FallDetectionToNav2()
+        msg = String()
         x, y, z, w = get_dest()
 
-        msg.dest_x = x
-        msg.dest_y = y
-        msg.dest_z = z
-        msg.dest_w = w
+        msg.data = f"{x}, {y}, {z}, {w}"
 
         self.publisher_.publish(msg)
-        self.get_logger().info(f"I pub: {msg.x}, {msg.y}, {msg.z}, {msg.w}")
+        self.get_logger().info(f"I pub: {msg.data}")
 
 
 def main(args=None):
