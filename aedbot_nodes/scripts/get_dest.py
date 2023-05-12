@@ -2,48 +2,54 @@
 
 import rclpy
 from rclpy.node import Node
+import time
+import json
+import requests
 
-from aedbot_interfaces.msg import FallDetectionToNav2
+from aedbot_interfaces.srv import FallDetectionToNav2
+
+URL = "http://130.162.152.119"
 
 
 def get_dest():
-    x, y, z, w = 1.0, 2.0, 3.0, 4.0
+    r = requests.get(url=URL + "/get_dest")
+    data = r.json()
+
+    x = data["x"]
+    y = data["y"]
+    z = data["z"]
+    w = data["w"]
     return x, y, z, w
 
 
-class MinimalPublisher(Node):
-    def __init__(self):
-        super().__init__("get_dest")
-        self.publisher_ = self.create_publisher(
-            FallDetectionToNav2, "dest_val", 10
-        )  # CHANGE
-        timer_period = 0.5
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
-
-    def timer_callback(self):
-        msg = FallDetectionToNav2()
-        x, y, z, w = get_dest()
-
-        msg.dest_x = x
-        msg.dest_y = y
-        msg.dest_z = z
-        msg.dest_w = w
-
-        self.publisher_.publish(msg)
-        self.get_logger().info(
-            f"I pub: {msg.dest_x}, {msg.dest_y}, {msg.dest_z}, {msg.dest_w}"
-        )
-
-
-def main():
+def main(args=None):
+    prev_time = time.time()
     rclpy.init()
 
-    minimal_publisher = MinimalPublisher()
+    node = rclpy.create_node("get_dest_node")
+    publisher = node.create_publisher(FallDetectionToNav2, "dest_val", 10)
 
-    rclpy.spin(minimal_publisher)
+    while True:
+        now_time = time.time()
+        if abs(prev_time - now_time) > 0.1:
+            msg = FallDetectionToNav2()
 
-    minimal_publisher.destroy_node()
+            x, y, z, w = get_dest()
+
+            msg.dest_x = x
+            msg.dest_y = y
+            msg.dest_z = z
+            msg.dest_w = w
+
+            publisher.publish(msg)
+
+            rclpy.get_logger().info(
+                f"I pub: {msg.dest_x}, {msg.dest_y}, {msg.dest_z}, {msg.dest_w}"
+            )
+
+        prev_time = now_time
+
+    node.destroy_node()
     rclpy.shutdown()
 
 
