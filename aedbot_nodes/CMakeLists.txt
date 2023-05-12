@@ -8,6 +8,8 @@ project(aedbot_nodes)
 # Find ament packages and libraries for ament and system dependencies
 ################################################################################
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_ros REQUIRED)
+find_package(ament_cmake_core REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
@@ -69,7 +71,8 @@ include_directories(
 ################################################################################
 
 # Install Python modules
-#ament_python_install_package(${PROJECT_NAME})
+ament_python_install_package(
+  ${PROJECT_NAME} PACKAGE_DIR "src")
 
 # Install Python executables
 install(PROGRAMS
