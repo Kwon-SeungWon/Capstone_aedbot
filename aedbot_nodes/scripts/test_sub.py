@@ -26,9 +26,8 @@ def main(args=None):
     rclpy.init(args=args)
     node = Sub()
 
-    with suppress(KeyboardInterrupt):
-        while True:
-            rclpy.spin_once(node, timeout_sec=0.1)
+    while True:
+        rclpy.spin_once(node, timeout_sec=0.1)
 
     node.destroy_node()
     rclpy.shutdown()

@@ -13,10 +13,10 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <exec_depend>aedbot_bringup</exec_depend>
   <exec_depend>aedbot_cartographer</exec_depend>
-  <!-- <exec_depend>aedbot_interfaces</exec_depend> -->
+  <exec_depend>aedbot_interfaces</exec_depend>
   <exec_depend>aedbot_description</exec_depend>
   <exec_depend>aedbot_navigation2</exec_depend>
-  <!-- <exec_depend>aedbot_node</exec_depend> -->
+  <exec_depend>aedbot_nodes</exec_depend>
   <exec_depend>aedbot_teleop</exec_depend>
   <export>
     <build_type>ament_cmake</build_type>
