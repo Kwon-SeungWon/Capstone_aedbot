@@ -8,7 +8,7 @@ import json
 from aedbot_interfaces.msg import FallDetectionToNav2
 
 
-URL = "http:130.162.152.119"
+URL = "http://130.162.152.119"
 
 
 def get_dest():
