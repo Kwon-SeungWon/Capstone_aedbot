@@ -34,17 +34,17 @@ class MinimalPublisher(Node):
         self.i = 0
 
     def timer_callback(self):
-        msg = FallDetectionToNav2()
+        destination = FallDetectionToNav2()
         x, y, z, w = get_dest()
 
-        msg.dest_x = x
-        msg.dest_y = y
-        msg.dest_z = z
-        msg.dest_w = w
+        destination.dest_x = x
+        destination.dest_y = y
+        destination.dest_z = z
+        destination.dest_w = w
 
-        self.publisher_.publish(msg)
+        self.publisher_.publish(destination)
         self.get_logger().info(
-            f"I pub: {msg.dest_x}, {msg.dest_y}, {msg.dest_z}, {msg.dest_w}"
+            f"I pub: {destination.dest_x}, {destination.dest_y}, {destination.dest_z}, {destination.dest_w}"
         )
 
 

@@ -24,15 +24,6 @@ class GotoGoal(Node):
         self.subscription
 
     def dest_val_callback(self, destination):
-        goal_poses = []
-        goal_pose = PoseStamped()
-        goal_pose.header.frame_id = "map"
-        goal_pose.header.stamp = BasicNavigator.get_clock().now().to_msg()
-        goal_pose.pose.position.x = destination.dest_x
-        goal_pose.pose.position.y = destination.dest_y
-        goal_pose.pose.orientation.z = destination.dest_z
-        goal_pose.pose.orientation.w = destination.dest_w
-        self.goal = goal_poses.append(goal_pose)
         self.get_logger().info(
             "Incoming Destination is \nx: %f\n y: %f\n z: %f\n w: %f\n"
             % (
@@ -42,6 +33,12 @@ class GotoGoal(Node):
                 destination.dest_w,
             )
         )
+
+        self.destination_x = destination.dest_x
+        self.destination_y = destination.dest_y
+        self.destination_z = destination.dest_z
+        self.destination_w = destination.dest_w
+
         self.go_to_destination()
 
     def go_to_destination(self):
@@ -85,9 +82,21 @@ class GotoGoal(Node):
         # local_costmap = navigator.getLocalCostmap()
         ######################################################
 
+        goal_poses = []
+        goal_pose = PoseStamped()
+        goal_pose.header.frame_id = "map"
+        goal_pose.header.stamp = navigator.get_clock().now().to_msg()
+        goal_pose.pose.position.x = self.destination_x
+        goal_pose.pose.position.y = self.destination_y
+        goal_pose.pose.orientation.z = self.destination_z
+        goal_pose.pose.orientation.w = self.destination_w
+        goal_poses.append(goal_pose)
+
+        self.get_logger().info("GOGOGOGOGOGOGOOGGOOGGO")
+
         # LET'S GO
         nav_start = navigator.get_clock().now()
-        navigator.followWaypoints(self.goal)
+        navigator.followWaypoints(goal_poses)
 
         i = 0
 
@@ -271,8 +280,8 @@ def main():
     # Service 노드 실행
     go_to_goal = GotoGoal()
 
-    rclpy.spin(bridge)
     rclpy.spin(go_to_goal)
+    rclpy.spin(bridge)
 
     rclpy.shutdown()
 
