@@ -2,35 +2,37 @@
 
 import rclpy
 from rclpy.node import Node
+from contextlib import suppress
+from rclpy.qos import QoSProfile
 
 from aedbot_interfaces.srv import FallDetectionToNav2
 
 
-class MinimalSubscriber(Node):
-
+class Sub(Node):
     def __init__(self):
-        super().__init__('minimal_subscriber')
-        self.subscription = self.create_subscription(
-            FallDetectionToNav2,
-            'dest_val',
-            self.listener_callback,
-            10)
-        self.subscription
+        super().__init__("sub")
+        qos_profile = QoSProfile(depth=10)
 
-    def listener_callback(self, msg):
-        self.get_logger().info(f'I heard: {msg.x}, {msg.y}, {msg.z}, {msg.w}')
+        self.subscription = self.create_subscription(
+            FallDetectionToNav2, "get_dest", self.listener_callback_predict, qos_profile
+        )
+
+    def listener_callback_predict(self, msg):
+        # append and delete
+        print("I heard: {}".format(msg.data))
 
 
 def main(args=None):
     rclpy.init(args=args)
+    node = Sub()
 
-    minimal_subscriber = MinimalSubscriber()
+    with suppress(KeyboardInterrupt):
+        while True:
+            rclpy.spin_once(node, timeout_sec=0.1)
 
-    rclpy.spin(minimal_subscriber)
-
-    minimal_subscriber.destroy_node()
+    node.destroy_node()
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -2,6 +2,8 @@
 
 import rclpy
 from rclpy.node import Node
+import time
+from contextlib import suppress
 
 from aedbot_interfaces.srv import FallDetectionToNav2
 
@@ -10,38 +12,26 @@ def get_dest():
     x, y, z, w = 1.0, 2.0, 3.0, 4.0
     return x, y, z, w
 
-class MinimalPublisher(Node):
-
-    def __init__(self):
-        super().__init__('minimal_publisher')
-        self.publisher_ = self.create_publisher(FallDetectionToNav2, 'dest_val', 10)     # CHANGE
-        timer_period = 0.5
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
-
-    def timer_callback(self):
-        msg = FallDetectionToNav2()
-        x,y,z,w = get_dest()
-        
-        msg.dest_x = x
-        msg.dest_y = y
-        msg.dest_z = z
-        msg.dest_w = w
-        
-        self.publisher_.publish(msg)
-        self.get_logger().info(f'I pub: {msg.x}, {msg.y}, {msg.z}, {msg.w}')
-
 
 def main(args=None):
-    rclpy.init(args=args)
+    prev_time = time.time()
+    rclpy.init()
 
-    minimal_publisher = MinimalPublisher()
+    node = rclpy.create_node("get_dest_node")
+    publisher = node.create_publisher(FallDetectionToNav2, "dest_val", 10)
 
-    rclpy.spin(minimal_publisher)
+    x, y, z, w = get_dest()
+    with suppress(KeyboardInterrupt):
+        while True:
+            now_time = time.time()
+            if abs(prev_time - now_time) > 0.1:
+                msg = FallDetectionToNav2()
+                publisher.publish(msg)
+            prev_time = now_time
 
-    minimal_publisher.destroy_node()
-    rclpy.shutdown()
+        node.destroy_node()
+        rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
