@@ -25,8 +25,10 @@ class Sub(Node):
         self.nav_done = False
 
     def listener_callback_predict(self, msg):
-        self.nav_done = True
-        print("I heard: {}".format(msg.data))
+        if msg.arrive_destination is True:
+            self.nav_done = True
+
+        # print("I heard: {}".format(msg.data))
 
 
 def main():
