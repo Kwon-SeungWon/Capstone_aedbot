@@ -154,7 +154,7 @@ class Bridge(Node):
 
         if NavigationResult.SUCCEEDED == True:
             self.pubslisher = self.create_publisher(Bridge, "arrive_dest", 10)
-            timer_period = 0.5
+            timer_period = 1
             self.timer = self.create_timer(timer_period, self.timer_callback)
             self.i = 0
         ## 추후 서브스크라이버 추가
