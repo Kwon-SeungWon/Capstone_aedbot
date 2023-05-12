@@ -7,8 +7,7 @@ from rclpy.duration import Duration  # Handles time for ROS 2
 import rclpy  # Python client library for ROS 2
 from rclpy.node import Node
 
-from aedbot_interfaces.msg import Bridge
-from aedbot_interfaces.srv import FallDetectionToNav2
+from aedbot_interfaces.msg import Bridge, FallDetectionToNav2
 from robot_navigator import BasicNavigator, NavigationResult  # Helper module
 
 """
@@ -18,12 +17,13 @@ Follow waypoints using the ROS 2 Navigation Stack (Nav2)
 
 class GotoGoal(Node):
     def __init__(self):
-        super().__init__("Gotogoal_Server")
-        self.srv = self.create_service(
-            FallDetectionToNav2, "dest_val", self.dest_val_callback
+        super().__init__("Gotogoal_Subscriber")
+        self.subscription = self.create_subscription(
+            FallDetectionToNav2, "dest_val", self.dest_val_callback, 10
         )
+        self.subscription
 
-    def dest_val_callback(self, destination, location):
+    def dest_val_callback(self, destination):
         goal_poses = []
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = "map"
@@ -42,11 +42,7 @@ class GotoGoal(Node):
                 destination.dest_w,
             )
         )
-        location = "사고 발생지점 수신완료"
-
         self.go_to_destination()
-
-        return location
 
     def go_to_destination(self):
         # Launch the ROS 2 Navigation Stack
