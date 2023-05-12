@@ -12,13 +12,14 @@ URL = "http://130.162.152.119"
 
 
 def get_dest():
-    r = requests.get(url=URL + "/get_dest")
-    data = r.json()
+    # r = requests.get(url=URL + "/get_dest")
+    # data = r.json()
 
-    x = data["x"]
-    y = data["y"]
-    z = data["z"]
-    w = data["w"]
+    # x = data["x"]
+    # y = data["y"]
+    # z = data["z"]
+    # w = data["w"]
+    x, y, z, w = 3.0, 4.0, 5.0, 6.0
     return x, y, z, w
 
 
