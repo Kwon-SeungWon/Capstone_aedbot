@@ -7,6 +7,7 @@ from rclpy.duration import Duration  # Handles time for ROS 2
 import rclpy  # Python client library for ROS 2
 from rclpy.node import Node
 
+from aedbot_interfaces.msg import Bridge
 from aedbot_interfaces.srv import FallDetectionToNav2
 from robot_navigator import BasicNavigator, NavigationResult  # Helper module
 
@@ -42,7 +43,7 @@ class GotoGoal(Node):
             )
         )
         location = "사고 발생지점 수신완료"
-        
+
         self.go_to_destination()
 
         return location
@@ -77,10 +78,10 @@ class GotoGoal(Node):
 
         # You may use the navigator to clear or obtain costmaps
         #####################################################
-        
+
         # 주기적으로 local, global costmap clear (5s 마다)
         navigator.clear_periodically_costmap()
-        
+
         navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
         # global_costmap = navigator.getGlobalCostmap()
         # local_costmap = navigator.getLocalCostmap()
@@ -147,13 +148,38 @@ class GotoGoal(Node):
         exit(0)
 
 
+class Bridge(Node):
+    def __init__(self):
+        super().__init__("Bridge_Node")
+
+        if NavigationResult.SUCCEEDED == True:
+            self.pubslisher = self.create_publisher(Bridge, "arrive_dest", 10)
+            timer_period = 0.5
+            self.timer = self.create_timer(timer_period, self.timer_callback)
+            self.i = 0
+        ## 추후 서브스크라이버 추가
+
+    def timer_callback(self):
+        msg = Bridge()
+        msg.arrive_destination = True
+        self.publisher.publish(msg)
+        self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
+        self.i += 1
+
+        if self.i == 5:
+            exit(0)
+
+
 def main():
     # Start the ROS 2 Python Client Library
     rclpy.init()
 
+    # bridge 노드 실행
+    bridge = Bridge()
     # Service 노드 실행
     go_to_goal_service = GotoGoal()
 
+    rclpy.spin(bridge)
     rclpy.spin(go_to_goal_service)
 
     rclpy.shutdown()
