@@ -77,9 +77,9 @@ class ComplementaryFilter():
     #print self.theta*180/3.141, self.wheel_ang*180/3.141, gyro, d_time
     return self.theta
 
-class OMOR1MiniNode(Node):
+class AedBotNode(Node):
   def __init__(self):
-    super().__init__('aedbot_motor_setting')
+    super().__init__('aedbot_bringup')
     # Declare parameters from YAML
     self.declare_parameters(
       namespace='',
@@ -386,10 +386,10 @@ class OMOR1MiniNode(Node):
 
 def main(args=None):
   rclpy.init(args=args)
-  omoR1MiniNode = OMOR1MiniNode()
-  rclpy.spin(omoR1MiniNode)
+  aedbotNode = AedBotNode()
+  rclpy.spin(aedbotNode)
   
-  omoR1MiniNode.destroy_node()
+  aedbotNode.destroy_node()
   rclpy.shutdown()
 
 if __name__ == '__main__':
