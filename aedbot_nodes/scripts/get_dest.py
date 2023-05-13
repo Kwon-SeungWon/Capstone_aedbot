@@ -4,11 +4,13 @@ import rclpy
 from rclpy.node import Node
 import requests
 import json
+import datetime
 
 from aedbot_interfaces.msg import FallDetectionToNav2
 
 
 URL = "http://130.162.152.119"
+TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
 
 
 def get_dest():
@@ -19,8 +21,9 @@ def get_dest():
     y = data["y"]
     z = data["z"]
     w = data["w"]
+    time = data["time"]
 
-    return x, y, z, w
+    return x, y, z, w, time
 
 
 class MinimalPublisher(Node):
@@ -31,25 +34,35 @@ class MinimalPublisher(Node):
         )  # CHANGE
         timer_period = 0.5
         self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
+        self.state = False
 
     def timer_callback(self):
+        if self.state:
+            return None
+
         destination = FallDetectionToNav2()
-        x, y, z, w = get_dest()
+        x, y, z, w, time = get_dest()
 
-        destination.dest_x = x
-        destination.dest_y = y
-        destination.dest_z = z
-        destination.dest_w = w
+        current_time = datetime.datetime.now().strftime(TIME_FORMAT)
+        time_diff = datetime.datetime.strptime(
+            current_time, TIME_FORMAT
+        ) - datetime.datetime.strptime(time, TIME_FORMAT)
 
-        self.publisher_.publish(destination)
-        self.get_logger().info(
-            f"I pub: {destination.dest_x}, {destination.dest_y}, {destination.dest_z}, {destination.dest_w}"
-        )
-        self.i += 1
+        time_diff = time_diff.total_seconds()  # float
 
-        if self.i == 2:
-            exit(0)
+        if time_diff <= 10:
+            destination.dest_x = x
+            destination.dest_y = y
+            destination.dest_z = z
+            destination.dest_w = w
+
+            for _ in range(5):
+                self.publisher_.publish(destination)
+                self.get_logger().info(
+                    f"I pub: {destination.dest_x}, {destination.dest_y}, {destination.dest_z}, {destination.dest_w}"
+                )
+
+            self.state = True
 
 
 def main():
