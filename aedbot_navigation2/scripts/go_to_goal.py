@@ -46,17 +46,33 @@ class GotoGoal(Node):
         navigator = BasicNavigator()
 
         # Set the robot's initial pose if necessary
+        # initial_poses = []
+        # initial_pose = PoseStamped()
+        # initial_pose.header.frame_id = "map"
+        # initial_pose.header.stamp = navigator.get_clock().now().to_msg()
+        # initial_pose.pose.position.x = 0.0
+        # initial_pose.pose.position.y = 0.0
+        # initial_pose.pose.position.z = 0.0
+        # initial_pose.pose.orientation.x = 0.0
+        # initial_pose.pose.orientation.y = 0.0
+        # initial_pose.pose.orientation.z = 0.0
+        # initial_pose.pose.orientation.w = 1.0
+        # self.initial_pose = initial_poses.append(initial_pose)
+        # navigator.setInitialPose(initial_pose)
+
+        # Position(-0.868823, -0.701858, 0), Orientation(0, 0, 0.00289794, 0.999996) = Angle: 0.00579588
+        
         initial_poses = []
         initial_pose = PoseStamped()
         initial_pose.header.frame_id = "map"
         initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-        initial_pose.pose.position.x = 0.0
-        initial_pose.pose.position.y = 0.0
+        initial_pose.pose.position.x = -0.868823
+        initial_pose.pose.position.y = -0.701858
         initial_pose.pose.position.z = 0.0
         initial_pose.pose.orientation.x = 0.0
         initial_pose.pose.orientation.y = 0.0
-        initial_pose.pose.orientation.z = 0.0
-        initial_pose.pose.orientation.w = 1.0
+        initial_pose.pose.orientation.z = 0.00289794
+        initial_pose.pose.orientation.w = 0.999996
         self.initial_pose = initial_poses.append(initial_pose)
         navigator.setInitialPose(initial_pose)
 
@@ -92,12 +108,13 @@ class GotoGoal(Node):
         goal_pose.pose.orientation.w = self.destination_w
         goal_poses.append(goal_pose)
 
-        self.get_logger().info("GOGOGOGOGOGOGOOGGOOGGO")
 
         # LET'S GO
         nav_start = navigator.get_clock().now()
         navigator.followWaypoints(goal_poses)
+        #navigator.goToPose(goal_pose)
 
+        self.get_logger().info("GOGOGOGOGOGOGOOGGOOGGO")
         i = 0
 
         while not navigator.isNavComplete():
@@ -140,12 +157,12 @@ class GotoGoal(Node):
                     navigator.followWaypoints(goal_poses)
 
         # Do something depending on the return code
-        self.result = navigator.getResult()
-        if self.result == NavigationResult.SUCCEEDED:
+        result = navigator.getResult()
+        if result == NavigationResult.SUCCEEDED:
             print("Goal succeeded!")
-        elif self.result == NavigationResult.CANCELED:
+        elif result == NavigationResult.CANCELED:
             print("Goal was canceled!")
-        elif self.result == NavigationResult.FAILED:
+        elif result == NavigationResult.FAILED:
             print("Goal failed!")
         else:
             print("Goal has an invalid return status!")
@@ -283,6 +300,8 @@ def main():
     rclpy.spin(go_to_goal)
     rclpy.spin(bridge)
 
+    go_to_goal.destroy_node()
+    bridge.destroy_node()
     rclpy.shutdown()
 
 

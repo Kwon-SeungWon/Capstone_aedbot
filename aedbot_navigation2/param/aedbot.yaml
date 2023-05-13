@@ -254,7 +254,7 @@ map_server:
     use_sim_time: False
 
     ##################추후 변경######################
-    yaml_filename: "map_112_0510.yaml" 
+    yaml_filename: "map_112_0504.yaml" 
 
 map_saver:
   ros__parameters:
@@ -305,7 +305,7 @@ robot_state_publisher:
 
 waypoint_follower:
   ros__parameters:
-    loop_rate: 2
+    loop_rate: 20
     stop_on_failure: false
     waypoint_task_executor_plugin: "wait_at_waypoint"   
     wait_at_waypoint:

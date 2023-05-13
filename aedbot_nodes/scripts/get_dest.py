@@ -46,6 +46,10 @@ class MinimalPublisher(Node):
         self.get_logger().info(
             f"I pub: {destination.dest_x}, {destination.dest_y}, {destination.dest_z}, {destination.dest_w}"
         )
+        self.i += 1
+
+        if self.i == 2:
+            exit(0)
 
 
 def main():
