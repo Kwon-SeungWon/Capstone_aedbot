@@ -152,6 +152,8 @@ class BasicNavigator(Node):
         self.debug("Waiting for 'FollowWaypoints' action server")
         while not self.follow_waypoints_client.wait_for_server(timeout_sec=1.0):
             self.info("'FollowWaypoints' action server not available, waiting...")
+            self.info(f"poses: {poses}")
+
 
         goal_msg = FollowWaypoints.Goal()
         goal_msg.poses = poses

@@ -14,34 +14,8 @@ from robot_navigator import BasicNavigator, NavigationResult  # Helper module
 Follow waypoints using the ROS 2 Navigation Stack (Nav2)
 """
 
-
-class GotoGoal(Node):
-    def __init__(self):
-        super().__init__("Gotogoal_Subscriber")
-        self.subscription = self.create_subscription(
-            FallDetectionToNav2, "dest_val", self.dest_val_callback, 10
-        )
-        self.subscription
-
-    def dest_val_callback(self, destination):
-        self.get_logger().info(
-            "Incoming Destination is \nx: %f\n y: %f\n z: %f\n w: %f\n"
-            % (
-                destination.dest_x,
-                destination.dest_y,
-                destination.dest_z,
-                destination.dest_w,
-            )
-        )
-
-        self.destination_x = destination.dest_x
-        self.destination_y = destination.dest_y
-        self.destination_z = destination.dest_z
-        self.destination_w = destination.dest_w
-
-        self.go_to_destination()
-
-    def go_to_destination(self):
+class Go_to_Destination():
+    def set_initial_pose(self):
         # Launch the ROS 2 Navigation Stack
         navigator = BasicNavigator()
 
@@ -71,8 +45,8 @@ class GotoGoal(Node):
         initial_pose.pose.position.z = 0.0
         initial_pose.pose.orientation.x = 0.0
         initial_pose.pose.orientation.y = 0.0
-        initial_pose.pose.orientation.z = 0.00289794
-        initial_pose.pose.orientation.w = 0.999996
+        initial_pose.pose.orientation.z = 0.0
+        initial_pose.pose.orientation.w = 1.0
         self.initial_pose = initial_poses.append(initial_pose)
         navigator.setInitialPose(initial_pose)
 
@@ -98,63 +72,56 @@ class GotoGoal(Node):
         # local_costmap = navigator.getLocalCostmap()
         ######################################################
 
+    def go_to_destination(self):
+        navigator = BasicNavigator()
+
+        go = GotoGoal()
+
         goal_poses = []
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = "map"
         goal_pose.header.stamp = navigator.get_clock().now().to_msg()
-        goal_pose.pose.position.x = self.destination_x
-        goal_pose.pose.position.y = self.destination_y
-        goal_pose.pose.orientation.z = self.destination_z
-        goal_pose.pose.orientation.w = self.destination_w
+        goal_pose.pose.position.x = go.destination_x
+        goal_pose.pose.position.y = go.destination_y
+        goal_pose.pose.position.z = 0.0
+        goal_pose.pose.orientation.x = 0.0
+        goal_pose.pose.orientation.y = 0.0
+        goal_pose.pose.orientation.z = go.destination_z
+        goal_pose.pose.orientation.w = go.destination_w
         goal_poses.append(goal_pose)
-
+        print(goal_poses)
 
         # LET'S GO
         nav_start = navigator.get_clock().now()
-        navigator.followWaypoints(goal_poses)
-        #navigator.goToPose(goal_pose)
+        #navigator.followWaypoints(goal_poses)
+        navigator.goToPose(goal_pose)
 
-        self.get_logger().info("GOGOGOGOGOGOGOOGGOOGGO")
+        print("GOGOGOGOGOGOGOOGGOOGGO")
         i = 0
 
-        while not navigator.isNavComplete():
-            #################################################
-            #                                               #
-            # Implement some code here for your application!#
-            #                                               #
-            #################################################
 
+        while not navigator.isNavComplete():
+            ################################################
+            #
+            # Implement some code here for your application!
+            #
+            ################################################
+        
             # Do something with the feedback
             i = i + 1
             feedback = navigator.getFeedback()
             if feedback and i % 5 == 0:
-                print(
-                    "Executing current waypoint: "
-                    + str(feedback.current_waypoint + 1)
-                    + "/"
-                    + str(len(goal_poses))
-                )
-                now = navigator.get_clock().now()
-
+                print('Distance remaining: ' + '{:.2f}'.format(
+                        feedback.distance_remaining) + ' meters.')
+            
                 # Some navigation timeout to demo cancellation
-                if now - nav_start > Duration(seconds=100000000.0):
+                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=600.0):
                     navigator.cancelNav()
-
-                # Some follow waypoints request change to demo preemption
-                if now - nav_start > Duration(seconds=500000.0):
-                    goal_pose_alt = PoseStamped()
-                    goal_pose_alt.header.frame_id = "map"
-                    goal_pose_alt.header.stamp = now.to_msg()
-                    goal_pose_alt.pose.position.x = 0.0
-                    goal_pose_alt.pose.position.y = 0.0
-                    goal_pose_alt.pose.position.z = 0.0
-                    goal_pose_alt.pose.orientation.x = 0.0
-                    goal_pose_alt.pose.orientation.y = 0.0
-                    goal_pose_alt.pose.orientation.z = 0.0
-                    goal_pose_alt.pose.orientation.w = 1.0
-                    goal_poses = [goal_pose_alt]
-                    nav_start = now
-                    navigator.followWaypoints(goal_poses)
+            
+                # Some navigation request change to demo preemption
+                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=120.0):
+                    goal_pose.pose.position.x = -3.0
+                    navigator.goToPose(goal_pose)
 
         # Do something depending on the return code
         result = navigator.getResult()
@@ -171,6 +138,7 @@ class GotoGoal(Node):
 
         exit(0)
 
+class BackToStation():
     def back_to_station(self):
         # Launch the ROS 2 Navigation Stack
         navigator = BasicNavigator()
@@ -255,7 +223,38 @@ class GotoGoal(Node):
         navigator.lifecycleShutdown()
 
         exit(0)
+class GotoGoal(Node):
 
+    destination_x = 0.0
+    destination_y = 0.0
+    destination_z = 0.0
+    destination_w = 0.0
+
+    def __init__(self):
+        super().__init__("Gotogoal_Subscriber")
+        self.subscription = self.create_subscription(
+            FallDetectionToNav2, "dest_val", self.dest_val_callback, 10
+        )
+        self.subscription
+
+    def dest_val_callback(self, destination):
+        self.get_logger().info(
+            "Incoming Destination is \nx: %f\n y: %f\n z: %f\n w: %f\n"
+            % (
+                destination.dest_x,
+                destination.dest_y,
+                destination.dest_z,
+                destination.dest_w,
+            )
+        )
+
+        GotoGoal.destination_x = destination.dest_x
+        GotoGoal.destination_y = destination.dest_y
+        GotoGoal.destination_z = destination.dest_z
+        GotoGoal.destination_w = destination.dest_w
+
+        start = Go_to_Destination()
+        start.go_to_destination()
 
 class Bridge_to_Web_CPR(Node):
     def __init__(self):
@@ -284,14 +283,20 @@ class Bridge_to_Web_CPR(Node):
             exit(0)
 
     def listener_callback(self, msg):
+
+        come_back = BackToStation()
+
         if msg.complete_cpr and msg.complete_web == True:
-            GotoGoal.back_to_station()
+            come_back.back_to_station()
 
 
 def main():
     # Start the ROS 2 Python Client Library
     rclpy.init()
 
+    go_to_destination = Go_to_Destination()
+    go_to_destination.set_initial_pose()
+    
     # bridge 노드 실행
     bridge = Bridge_to_Web_CPR()
     # Service 노드 실행
