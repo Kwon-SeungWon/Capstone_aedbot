@@ -5,12 +5,14 @@ from rclpy.node import Node
 import requests
 import json
 import datetime
+from pytz import timezone  # pip3 install pytz
 
 from aedbot_interfaces.msg import FallDetectionToNav2
 
 
 URL = "http://130.162.152.119"
 TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
+KST = timezone("Asia/Seoul")
 
 
 def get_dest():
@@ -43,7 +45,7 @@ class MinimalPublisher(Node):
         destination = FallDetectionToNav2()
         x, y, z, w, time = get_dest()
 
-        current_time = datetime.datetime.now().strftime(TIME_FORMAT)
+        current_time = datetime.datetime.now(KST).strftime(TIME_FORMAT)
         time_diff = datetime.datetime.strptime(
             current_time, TIME_FORMAT
         ) - datetime.datetime.strptime(time, TIME_FORMAT)
