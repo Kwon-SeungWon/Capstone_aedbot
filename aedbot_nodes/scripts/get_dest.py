@@ -48,8 +48,7 @@ class MinimalPublisher(Node):
             current_time, TIME_FORMAT
         ) - datetime.datetime.strptime(time, TIME_FORMAT)
 
-        time_diff = time_diff.total_seconds()  # float
-        self.get_logger().info(f"time_diff: {time_diff}")
+        time_diff = abs(time_diff.total_seconds())  # float
 
         if time_diff <= 10:
             destination.dest_x = x
