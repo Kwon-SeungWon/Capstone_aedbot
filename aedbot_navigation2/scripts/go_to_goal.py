@@ -142,13 +142,30 @@ class BackToStation():
     def back_to_station(self):
         # Launch the ROS 2 Navigation Stack
         navigator = BasicNavigator()
+
+        go = GotoGoal()
+        
+        initial_poses = []
+        initial_pose = PoseStamped()
+        initial_pose.header.frame_id = "map"
+        initial_pose.header.stamp = navigator.get_clock().now().to_msg()
+        initial_pose.pose.position.x = go.destination_x
+        initial_pose.pose.position.y = go.destination_y
+        initial_pose.pose.position.z = 0.0
+        initial_pose.pose.orientation.x = 0.0
+        initial_pose.pose.orientation.y = 0.0
+        initial_pose.pose.orientation.z = go.destination_z
+        initial_pose.pose.orientation.w = go.destination_w
+        self.initial_pose = initial_poses.append(initial_pose)
+        navigator.setInitialPose(initial_pose)
+
         # Activate navigation, if not autostarted. This should be called after setInitialPose()
         # or this will initialize at the origin of the map and update the costmap with bogus readings.
         # If autostart, you should `waitUntilNav2Active()` instead.
-        # navigator.lifecycleStartup()
+        navigator.lifecycleStartup()
 
         # Wait for navigation to fully activate. Use this line if autostart is set to true.
-        navigator.waitUntilNav2Active()
+        #navigator.waitUntilNav2Active()
 
         # If desired, you can change or load the map as well
         # navigator.changeMap('/path/to/map.yaml')
@@ -164,9 +181,22 @@ class BackToStation():
         # local_costmap = navigator.getLocalCostmap()
         ######################################################
 
+        goal_poses = []
+        goal_pose = PoseStamped()
+        goal_pose.header.frame_id = "map"
+        goal_pose.header.stamp = navigator.get_clock().now().to_msg()
+        goal_pose.pose.position.x = 0.0
+        goal_pose.pose.position.y = 0.0
+        goal_pose.pose.position.z = 0.0
+        goal_pose.pose.orientation.x = 0.0
+        goal_pose.pose.orientation.y = 0.0
+        goal_pose.pose.orientation.z = 0.0
+        goal_pose.pose.orientation.w = 1.0
+        goal_poses.append(goal_pose)
+
         # LET'S GO
         nav_start = navigator.get_clock().now()
-        navigator.followWaypoints(self.initial_pose)
+        navigator.go_to_pose(goal_poses)
 
         i = 0
 
@@ -181,33 +211,18 @@ class BackToStation():
             i = i + 1
             feedback = navigator.getFeedback()
             if feedback and i % 5 == 0:
-                print(
-                    "Executing current waypoint: "
-                    + str(feedback.current_waypoint + 1)
-                    + "/"
-                    + str(len(goal_poses))
-                )
-                now = navigator.get_clock().now()
-
+                print('Distance remaining: ' + '{:.2f}'.format(
+                        feedback.distance_remaining) + ' meters.')
+            
                 # Some navigation timeout to demo cancellation
-                if now - nav_start > Duration(seconds=100000000.0):
+                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=600.0):
                     navigator.cancelNav()
+            
+                # Some navigation request change to demo preemption
+                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=120.0):
+                    goal_pose.pose.position.x = -3.0
+                    navigator.goToPose(goal_pose)
 
-                # Some follow waypoints request change to demo preemption
-                if now - nav_start > Duration(seconds=500000.0):
-                    goal_pose_alt = PoseStamped()
-                    goal_pose_alt.header.frame_id = "map"
-                    goal_pose_alt.header.stamp = now.to_msg()
-                    goal_pose_alt.pose.position.x = 0.0
-                    goal_pose_alt.pose.position.y = 0.0
-                    goal_pose_alt.pose.position.z = 0.0
-                    goal_pose_alt.pose.orientation.x = 0.0
-                    goal_pose_alt.pose.orientation.y = 0.0
-                    goal_pose_alt.pose.orientation.z = 0.0
-                    goal_pose_alt.pose.orientation.w = 1.0
-                    goal_poses = [goal_pose_alt]
-                    nav_start = now
-                    navigator.followWaypoints(self.initial_pose)
 
         # Do something depending on the return code
         result = navigator.getResult()
