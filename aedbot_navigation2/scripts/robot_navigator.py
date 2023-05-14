@@ -7,11 +7,11 @@ from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from lifecycle_msgs.srv import GetState
 from nav2_msgs.action import (
-    #NavigateThroughPoses,
+    # NavigateThroughPoses,
     NavigateToPose,
     FollowWaypoints,
     ComputePathToPose,
-    #ComputePathThroughPoses,
+    # ComputePathThroughPoses,
 )
 from nav2_msgs.srv import LoadMap, ClearEntireCostmap, ManageLifecycleNodes, GetCostmap
 
@@ -154,7 +154,6 @@ class BasicNavigator(Node):
             self.info("'FollowWaypoints' action server not available, waiting...")
             self.info(f"poses: {poses}")
 
-
         goal_msg = FollowWaypoints.Goal()
         goal_msg.poses = poses
 
@@ -293,9 +292,9 @@ class BasicNavigator(Node):
         else:
             self.info("Change map request was successful!")
         return
-    
-    def clear_periodically_costmap(self):
-        clear_period = 5
+
+    def clear_periodically_costmap(self, period):
+        clear_period = period
         self.clear = self.create_timer(clear_period, self.clearAllCostmaps())
         return
 

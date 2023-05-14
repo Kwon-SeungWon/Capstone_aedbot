@@ -14,7 +14,8 @@ from robot_navigator import BasicNavigator, NavigationResult  # Helper module
 Follow waypoints using the ROS 2 Navigation Stack (Nav2)
 """
 
-class Go_to_Destination():
+
+class Go_to_Destination:
     def set_initial_pose(self):
         # Launch the ROS 2 Navigation Stack
         navigator = BasicNavigator()
@@ -35,7 +36,7 @@ class Go_to_Destination():
         # navigator.setInitialPose(initial_pose)
 
         # Position(-0.868823, -0.701858, 0), Orientation(0, 0, 0.00289794, 0.999996) = Angle: 0.00579588
-        
+
         initial_poses = []
         initial_pose = PoseStamped()
         initial_pose.header.frame_id = "map"
@@ -65,7 +66,7 @@ class Go_to_Destination():
         #####################################################
 
         # 주기적으로 local, global costmap clear (5s 마다)
-        navigator.clear_periodically_costmap()
+        navigator.clear_periodically_costmap(5)
 
         navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
         # global_costmap = navigator.getGlobalCostmap()
@@ -93,12 +94,11 @@ class Go_to_Destination():
 
         # LET'S GO
         nav_start = navigator.get_clock().now()
-        #navigator.followWaypoints(goal_poses)
+        # navigator.followWaypoints(goal_poses)
         navigator.goToPose(goal_pose)
 
         print("GOGOGOGOGOGOGOOGGOOGGO")
         i = 0
-
 
         while not navigator.isNavComplete():
             ################################################
@@ -106,20 +106,27 @@ class Go_to_Destination():
             # Implement some code here for your application!
             #
             ################################################
-        
+
             # Do something with the feedback
             i = i + 1
             feedback = navigator.getFeedback()
             if feedback and i % 5 == 0:
-                print('Distance remaining: ' + '{:.2f}'.format(
-                        feedback.distance_remaining) + ' meters.')
-            
+                print(
+                    "Distance remaining: "
+                    + "{:.2f}".format(feedback.distance_remaining)
+                    + " meters."
+                )
+
                 # Some navigation timeout to demo cancellation
-                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=600.0):
+                if Duration.from_msg(feedback.navigation_time) > Duration(
+                    seconds=600.0
+                ):
                     navigator.cancelNav()
-            
+
                 # Some navigation request change to demo preemption
-                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=120.0):
+                if Duration.from_msg(feedback.navigation_time) > Duration(
+                    seconds=120.0
+                ):
                     goal_pose.pose.position.x = -3.0
                     navigator.goToPose(goal_pose)
 
@@ -138,13 +145,14 @@ class Go_to_Destination():
 
         exit(0)
 
-class BackToStation():
+
+class BackToStation:
     def back_to_station(self):
         # Launch the ROS 2 Navigation Stack
         navigator = BasicNavigator()
 
         go = GotoGoal()
-        
+
         initial_poses = []
         initial_pose = PoseStamped()
         initial_pose.header.frame_id = "map"
@@ -165,7 +173,7 @@ class BackToStation():
         navigator.lifecycleStartup()
 
         # Wait for navigation to fully activate. Use this line if autostart is set to true.
-        #navigator.waitUntilNav2Active()
+        # navigator.waitUntilNav2Active()
 
         # If desired, you can change or load the map as well
         # navigator.changeMap('/path/to/map.yaml')
@@ -211,18 +219,24 @@ class BackToStation():
             i = i + 1
             feedback = navigator.getFeedback()
             if feedback and i % 5 == 0:
-                print('Distance remaining: ' + '{:.2f}'.format(
-                        feedback.distance_remaining) + ' meters.')
-            
+                print(
+                    "Distance remaining: "
+                    + "{:.2f}".format(feedback.distance_remaining)
+                    + " meters."
+                )
+
                 # Some navigation timeout to demo cancellation
-                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=600.0):
+                if Duration.from_msg(feedback.navigation_time) > Duration(
+                    seconds=600.0
+                ):
                     navigator.cancelNav()
-            
+
                 # Some navigation request change to demo preemption
-                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=120.0):
+                if Duration.from_msg(feedback.navigation_time) > Duration(
+                    seconds=120.0
+                ):
                     goal_pose.pose.position.x = -3.0
                     navigator.goToPose(goal_pose)
-
 
         # Do something depending on the return code
         result = navigator.getResult()
@@ -238,8 +252,9 @@ class BackToStation():
         navigator.lifecycleShutdown()
 
         exit(0)
-class GotoGoal(Node):
 
+
+class GotoGoal(Node):
     destination_x = 0.0
     destination_y = 0.0
     destination_z = 0.0
@@ -252,7 +267,7 @@ class GotoGoal(Node):
         )
         self.subscription
 
-    def dest_val_callback(self, destination):
+    def dest_val_callback(self, destination: FallDetectionToNav2):
         self.get_logger().info(
             "Incoming Destination is \nx: %f\n y: %f\n z: %f\n w: %f\n"
             % (
@@ -271,23 +286,27 @@ class GotoGoal(Node):
         start = Go_to_Destination()
         start.go_to_destination()
 
+
 class Bridge_to_Web_CPR(Node):
     def __init__(self):
         super().__init__("Bridge_Node")
 
+        ## 목적지에 도착 했을 때
+        self.publisher = self.create_publisher(Bridge, "arrive_dest", 10)
+
+        # if BasicNavigator.getResult == 1:
+
+        timer_period = 1
+        self.timer = self.create_timer(timer_period, self.arrive_callback)
+        self.i = 0
+
+        ## CPR, WEB 통신이 끝났을 때
         self.subscription = self.create_subscription(
-            Bridge, "situation_end", self.listener_callback, 10  # CHANGE
+            Bridge, "situation_end", self.end_callback, 10  # CHANGE
         )
         self.subscription
 
-        if BasicNavigator.getResult == 1:
-            self.pubslisher = self.create_publisher(Bridge, "arrive_dest", 10)
-            timer_period = 1
-            self.timer = self.create_timer(timer_period, self.timer_callback)
-            self.i = 0
-        ## 추후 서브스크라이버 추가
-
-    def timer_callback(self):
+    def arrive_callback(self):
         msg = Bridge()
         msg.arrive_destination = True
         self.publisher.publish(msg)
@@ -297,30 +316,32 @@ class Bridge_to_Web_CPR(Node):
         if self.i == 5:
             exit(0)
 
-    def listener_callback(self, msg):
-
+    def end_callback(self, msg: Bridge):
         come_back = BackToStation()
 
         if msg.complete_cpr and msg.complete_web == True:
             come_back.back_to_station()
 
 
-def main():
+def main(args=None):
     # Start the ROS 2 Python Client Library
-    rclpy.init()
+    rclpy.init(args=args)
 
-    go_to_destination = Go_to_Destination()
-    go_to_destination.set_initial_pose()
-    
+    # go_to_destination = Go_to_Destination()
+    # go_to_destination.set_initial_pose()
+
     # bridge 노드 실행
-    bridge = Bridge_to_Web_CPR()
-    # Service 노드 실행
-    go_to_goal = GotoGoal()
 
-    rclpy.spin(go_to_goal)
+    bridge = Bridge_to_Web_CPR()
+
+    # Service 노드 실행
+
+    # go_to_goal = GotoGoal()
+
+    # rclpy.spin(go_to_goal)
     rclpy.spin(bridge)
 
-    go_to_goal.destroy_node()
+    # go_to_goal.destroy_node()
     bridge.destroy_node()
     rclpy.shutdown()
 
