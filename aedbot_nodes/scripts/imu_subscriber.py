@@ -33,11 +33,15 @@ class ImuSubscriberNode(Node):
         self.elapsed_time = 0
 
     def receiver_callback(self, msg: Bridge):
-        if msg.arrive_destination == True:
+        self.recieve_result = msg.arrive_destination
+
+        if self.recieve_result == True:
             print("Receive Complete")
-            self.imu_subscriber_ = self.create_subscription(
-                Imu, "/imu/data1", self.imu_callback, 10
-            )
+            print(msg.arrive_destination)
+
+        self.imu_subscriber_ = self.create_subscription(
+            Imu, "cpr_imu/data", self.imu_callback, 10
+        )
 
     def imu_callback(self, msg: Imu):
         # self.k= Bool.data
@@ -78,4 +82,9 @@ def main(args=None):
     rclpy.init(args=args)
     node = ImuSubscriberNode()
     rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()

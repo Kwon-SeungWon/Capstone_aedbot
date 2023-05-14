@@ -1,6 +1,5 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.parameter import Parameter
 
 from sensor_msgs.msg import Imu
 from std_msgs.msg import Bool
@@ -16,34 +15,19 @@ import time
 import math
 
 
-class Nav_ImuDriver(Node):
+class CPR_ImuDriver(Node):
     CONF_SYNC_LIN_ACC = 0x0004  # 센서 좌표계 가속도 (g)
     CONF_SYNC_ANG_VEL = 0x0008  # 센서 좌표계 각속도 (deg/s)
     CONF_SYNC_EULER = 0x0040  # 오일러각
     CONF_SYNC_QUATERNION = 0x0080  # 쿼터니언
 
     def __init__(self):
-        super().__init__("aedbot_imu_node")
+        super().__init__("cpr_imu_node")
         self._tf_prefix = self.get_parameter_or("tf_prefix", "")
-        ## EKF 필터를 쓸때는 tf FALSE!!!!!!!!
         self._is_send_tf = self.get_parameter_or("send_tf", False)
 
-        self.port_name = (
-            self.get_parameter_or(
-                "port.name",
-                Parameter("port.name", Parameter.Type.STRING, "/dev/ttyIMU"),
-            )
-            .get_parameter_value()
-            .string_value
-        )
-        self.baud_rate = (
-            self.get_parameter_or(
-                "port.baudrate",
-                Parameter("port.baudrate", Parameter.Type.INTEGER, 115200),
-            )
-            .get_parameter_value()
-            .integer_value
-        )
+        self.port_name = "/dev/ttyIMU2"
+        self.baud_rate = "115200"
         self._ser = serial.Serial(self.port_name, self.baud_rate)
         self._ser_io = io.TextIOWrapper(
             io.BufferedRWPair(self._ser, self._ser, 1),
@@ -71,7 +55,7 @@ class Nav_ImuDriver(Node):
 
         self._reset_sensor()
 
-        self._imu_pub_handler = self.create_publisher(Imu, "imu/data", 1)
+        self._imu_pub_handler = self.create_publisher(Imu, "cpr_imu/data", 10)
         self.create_service(Set, "reset_sensor", self._reset_sensor_callback)
         self.create_service(Set, "reset_angle", self._reset_angle_callback)
         self.timer = self.create_timer(0.01, self._serial_timer)
@@ -130,7 +114,7 @@ class Nav_ImuDriver(Node):
                     self._msg.orientation.z = q[3]
 
                     self._msg.header.stamp = self.get_clock().now().to_msg()
-                    self._msg.header.frame_id = self._tf_prefix + "imu_link"
+                    self._msg.header.frame_id = self._tf_prefix + "/imu_link"
                     self._imu_pub_handler.publish(self._msg)
                     if self._is_send_tf is True:
                         self._send_tf()
@@ -157,8 +141,8 @@ class Nav_ImuDriver(Node):
         br = tf2_ros.TransformBroadcaster(self)
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = self._tf_prefix + "base_link"
-        t.child_frame_id = self._tf_prefix + "imu_link"
+        t.header.frame_id = self._tf_prefix + "/base_link"
+        t.child_frame_id = self._tf_prefix + "/imu_link"
         t.transform.rotation.x = self._msg.orientation.x
         t.transform.rotation.y = self._msg.orientation.y
         t.transform.rotation.z = self._msg.orientation.z
@@ -203,11 +187,11 @@ class Nav_ImuDriver(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    nav_imu_driver_node = Nav_ImuDriver()
+    cpr_imu_driver_node = CPR_ImuDriver()
 
-    rclpy.spin(nav_imu_driver_node)
+    rclpy.spin(cpr_imu_driver_node)
 
-    nav_imu_driver_node.destroy_node()
+    cpr_imu_driver_node.destroy_node()
     rclpy.shutdown()
 
 

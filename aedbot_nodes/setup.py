@@ -40,6 +40,7 @@ setup(
             "test_sub = scripts.test_sub:main",
             "play_siren = scripts.play_siren:main",
             "HRI = scripts.HRI:main",
+            "cpr_node = scripts.cpr_node:main",
         ],
     },
 )
