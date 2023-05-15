@@ -33,17 +33,20 @@ class ImuSubscriberNode(Node):
         self.elapsed_time = 0
 
     def receiver_callback(self, msg: Bridge):
-        if msg.arrive_destination == True:
+        self.recieve_result = msg.arrive_destination
+
+        if self.recieve_result == True:
             print("Receive Complete")
+            print(msg.arrive_destination)
+
             self.imu_subscriber_ = self.create_subscription(
-                Imu, "/imu/data1", self.imu_callback, 10
-            )
+                Imu, "cpr_imu/data", self.imu_callback, 10)
 
     def imu_callback(self, msg: Imu):
         # self.k= Bool.data
         # self.get_logger().info('self.k:%s' %type(self.k))
-
-        playsound("/root/catkin_ws/src/aedbot/aedbot_nodes/music/120bpm.mp3", True)
+        print("imu_callback Complete")
+        #playsound("/root/catkin_ws/src/aedbot/aedbot_nodes/music/120bpm.mp3", True)
 
         count_msg = Int32()
         self.get_logger().info("count:%d" % count_msg.data)
@@ -52,21 +55,21 @@ class ImuSubscriberNode(Node):
             self.i = 1
             count_msg.data = 0
 
-        if msg.linear_acceleration.z < 3:
+        if msg.linear_acceleration.z < 1:
             if self.i == 1:
                 count_msg.data = 3
                 self.get_logger().info("count:%d" % count_msg.data)
                 self.publisher_.publish(count_msg)
                 self.i = 0
 
-        if 3 <= msg.linear_acceleration.z < 6:
+        if 1 <= msg.linear_acceleration.z < 5:
             if self.i == 1:
                 count_msg.data = 2
                 self.get_logger().info("count:%d" % count_msg.data)
                 self.publisher_.publish(count_msg)
                 self.i = 0
 
-        if 6 <= msg.linear_acceleration.z < 8:
+        if 5 <= msg.linear_acceleration.z < 6:
             if self.i == 1:
                 count_msg.data = 1
                 self.get_logger().info("count:%d" % count_msg.data)
@@ -78,4 +81,9 @@ def main(args=None):
     rclpy.init(args=args)
     node = ImuSubscriberNode()
     rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
+
+
+if __name__ == "__main__":
+    main()
