@@ -307,8 +307,6 @@ class Bridge_to_Web_CPR(Node):
         ## CPR, WEB 통신이 끝났을 때
         self.subscription = self.create_subscription(
             Int32, "situation_end", self.end_callback, 10  # CHANGE
-
-
         )
         self.subscription
 
@@ -341,8 +339,8 @@ def main(args=None):
     # Start the ROS 2 Python Client Library
     rclpy.init(args=args)
 
-    # go_to_destination = Go_to_Destination()
-    # go_to_destination.set_initial_pose()
+    go_to_destination = Go_to_Destination()
+    go_to_destination.set_initial_pose()
 
     # bridge 노드 실행
 
@@ -350,12 +348,12 @@ def main(args=None):
 
     # Service 노드 실행
 
-    # go_to_goal = GotoGoal()
+    go_to_goal = GotoGoal()
 
-    # rclpy.spin(go_to_goal)
+    rclpy.spin(go_to_goal)
     rclpy.spin(bridge)
 
-    # go_to_goal.destroy_node()
+    go_to_goal.destroy_node()
     bridge.destroy_node()
     rclpy.shutdown()
 

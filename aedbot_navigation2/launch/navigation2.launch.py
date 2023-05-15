@@ -34,7 +34,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory('aedbot_navigation2'),
             'map',
-            'map_112_0504.yaml'))       # map_112 파일 이름 변경하면 됨
+            'map_112_0516.yaml'))       # map_112 파일 이름 변경하면 됨
 
     param_file_name = 'aedbot.yaml'
     param_dir = LaunchConfiguration(
