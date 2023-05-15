@@ -6,10 +6,10 @@ import time
 import subprocess
 from rclpy.qos import QoSProfile
 
-from aedbot_interfaces.msg import FallDetectionToNav2
+from aedbot_interfaces.msg import FallDetectionToNav2, Bridge
 
 
-URL = "http://localhost:5000/predict"
+URL = "http://130.162.152.119/HRI"
 
 
 def get_face(self):
@@ -31,16 +31,16 @@ class Sub(Node):
         super().__init__("sub")
         qos_profile = QoSProfile(depth=10)
 
-        self.subscription = self.create_subscription(
+        self.subscription_start = self.create_subscription(
             FallDetectionToNav2,
-            "get_dest",
+            "dest_val",
             self.listener_callback_get_dest,
             qos_profile,
         )
 
         self.subscription_done = self.create_subscription(
             FallDetectionToNav2,
-            "get_dest",
+            "arrive_dest",
             self.listener_callback_done,
             qos_profile,
         )
