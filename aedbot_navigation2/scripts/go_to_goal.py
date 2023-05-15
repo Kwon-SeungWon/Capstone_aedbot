@@ -9,12 +9,13 @@ from rclpy.node import Node
 
 from aedbot_interfaces.msg import Bridge, FallDetectionToNav2
 from robot_navigator import BasicNavigator, NavigationResult  # Helper module
-
+from std_msgs.msg import Int32
 """
 Follow waypoints using the ROS 2 Navigation Stack (Nav2)
 """
 
-
+global count
+count = 0
 class Go_to_Destination:
     def set_initial_pose(self):
         # Launch the ROS 2 Navigation Stack
@@ -289,6 +290,7 @@ class GotoGoal(Node):
 
 class Bridge_to_Web_CPR(Node):
     def __init__(self):
+        global count
         super().__init__("Bridge_Node")
 
         ## 목적지에 도착 했을 때
@@ -297,30 +299,42 @@ class Bridge_to_Web_CPR(Node):
         # if BasicNavigator.getResult == 1:
 
         timer_period = 1
+        
+        
         self.timer = self.create_timer(timer_period, self.arrive_callback)
-        self.i = 0
+        
 
         ## CPR, WEB 통신이 끝났을 때
         self.subscription = self.create_subscription(
-            Bridge, "situation_end", self.end_callback, 10  # CHANGE
+            Int32, "situation_end", self.end_callback, 10  # CHANGE
+
+
         )
         self.subscription
 
     def arrive_callback(self):
+        global count
         msg = Bridge()
         msg.arrive_destination = True
-        self.publisher.publish(msg)
+        if count==0:
+            self.publisher.publish(msg)
+        if count ==1:
+            msg.arrive_destination = False
+            self.publisher.publish(msg)
         self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
-        self.i += 1
 
-        if self.i == 5:
-            exit(0)
+
+        # if self.i == 5:
+        #     exit(0)
 
     def end_callback(self, msg: Bridge):
         come_back = BackToStation()
+        global count
+        count +=1
 
         if msg.complete_cpr and msg.complete_web == True:
             come_back.back_to_station()
+
 
 
 def main(args=None):

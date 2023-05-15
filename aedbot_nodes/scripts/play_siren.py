@@ -32,15 +32,18 @@ class Sub(Node):
 
 
 def main():
+    os.system("sudo pulseaudio -k")
+    os.system("pactl -- set-sink-volume 0 200%")
+    os.system("pulseaudio --start")
     rclpy.init()
     node = Sub()
 
-    while True:
-        if node.nav_done:
-            break
+    #if node.nav_done:
+    #    break
 
-        rclpy.spin_once(node, timeout_sec=0.1)
-        playsound.playsound(SIREN_PATH, False)
+    rclpy.spin_once(node, timeout_sec=0.1)
+    
+    playsound.playsound(SIREN_PATH, True)
 
 
 if __name__ == "__main__":
