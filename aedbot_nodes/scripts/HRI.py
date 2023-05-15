@@ -9,7 +9,7 @@ from rclpy.qos import QoSProfile
 from aedbot_interfaces.msg import FallDetectionToNav2
 
 
-URL = "http://localhost:5000/predict"
+URL = "http://130.162.152.119/HRI"
 
 
 def get_face(self):
@@ -38,12 +38,12 @@ class Sub(Node):
             qos_profile,
         )
 
-        self.subscription_done = self.create_subscription(
-            FallDetectionToNav2,
-            "get_dest",
-            self.listener_callback_done,
-            qos_profile,
-        )
+        # self.subscription_done = self.create_subscription(
+        #     FallDetectionToNav2,
+        #     "get_dest",
+        #     self.listener_callback_done,
+        #     qos_profile,
+        # )
 
         self.state = False
 
