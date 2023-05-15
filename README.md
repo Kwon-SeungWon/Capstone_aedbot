@@ -20,7 +20,7 @@ Docker image Environment : ros2-foxy
 Pull한 Docker의 image를 컨테이너로 실행시킨다.
 
 ```bash
-  sudo docker run --net=host --env="DISPLAY" --volume="/dev:/dev" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" -it --name 'Capstone_AEDBOT' --privileged kwonseungwon/ros2:capstone_0509 /bin/bash 
+  sudo docker run --net=host --device /dev/snd --env="DISPLAY" --volume="/dev:/dev" --volume="$HOME/.Xauthority:/root/.Xauthority:rw" -it --name 'Capstone_AEDBOT' --privileged kwonseungwon/ros2:capstone_0509 /bin/bash 
 ```
 
 Gazebo가 GUI를 필요로하기에, Docker에서의 외부출력을 위해 docker option을 추가했다. (--env)
@@ -60,10 +60,10 @@ Gazebo가 GUI를 필요로하기에, Docker에서의 외부출력을 위해 dock
 ```
 ```bash
   KERNEL=="tty*", SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0001", MODE:="0666", GROUP:="dialout", SYMLINK+="ttyLIDAR"
-KERNEL=="tty*",SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0002", MODE:="0666", GROUP:="dialout", SYMLINK+="ttyIMU"
-KERNEL=="tty*",SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0003", MODE:="0666", GROUP:="dialout", SYMLINK+="ttyIMU2"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", MODE:="0777", SYMLINK+="ttyMotor"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="003d", ATTRS{serial}=="14235303036351707242", MODE:="0666", GROUP:="dialout", SYMLINK+="ttyArduino"
+  KERNEL=="tty*",SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0002", MODE:="0666", GROUP:="dialout", SYMLINK+="ttyIMU"
+  KERNEL=="tty*",SUBSYSTEM=="tty", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", ATTRS{serial}=="0003", MODE:="0666", GROUP:="dialout", SYMLINK+="ttyIMU2"
+  SUBSYSTEM=="tty", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", MODE:="0777", SYMLINK+="ttyMotor"
+  SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="003d", ATTRS{serial}=="14235303036351707242", MODE:="0666", GROUP:="dialout", SYMLINK+="ttyArduino"
 ```
 
 만약 rules.d 안에 다른 파일들이 있으면 파일 이름 뒤에 .backup을 붙여놓자.
