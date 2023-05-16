@@ -42,8 +42,8 @@ class Go_to_Destination:
         initial_pose = PoseStamped()
         initial_pose.header.frame_id = "map"
         initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-        initial_pose.pose.position.x = -0.868823
-        initial_pose.pose.position.y = -0.701858
+        initial_pose.pose.position.x = 0.0
+        initial_pose.pose.position.y = 0.0
         initial_pose.pose.position.z = 0.0
         initial_pose.pose.orientation.x = 0.0
         initial_pose.pose.orientation.y = 0.0
@@ -52,13 +52,8 @@ class Go_to_Destination:
         self.initial_pose = initial_poses.append(initial_pose)
         navigator.setInitialPose(initial_pose)
 
-        # Activate navigation, if not autostarted. This should be called after setInitialPose()
-        # or this will initialize at the origin of the map and update the costmap with bogus readings.
-        # If autostart, you should `waitUntilNav2Active()` instead.
-        navigator.lifecycleStartup()
-
         # Wait for navigation to fully activate. Use this line if autostart is set to true.
-        # navigator.waitUntilNav2Active()
+        navigator.waitUntilNav2Active()
 
         # If desired, you can change or load the map as well
         # navigator.changeMap('/path/to/map.yaml')
@@ -74,9 +69,11 @@ class Go_to_Destination:
         # local_costmap = navigator.getLocalCostmap()
         ######################################################
 
-    def go_to_destination(self):
-        navigator = BasicNavigator()
 
+    def go_to_destination(self):
+
+        navigator = BasicNavigator()
+        navigator.clear_periodically_costmap(3)
         go = GotoGoal()
 
         goal_poses = []
@@ -94,7 +91,7 @@ class Go_to_Destination:
         print(goal_poses)
 
         # LET'S GO
-        nav_start = navigator.get_clock().now()
+        #nav_start = navigator.get_clock().now()
         # navigator.followWaypoints(goal_poses)
         navigator.goToPose(goal_pose)
 
@@ -133,7 +130,10 @@ class Go_to_Destination:
 
         # Do something depending on the return code
         result = navigator.getResult()
+        global count
+        count = 0
         if result == NavigationResult.SUCCEEDED:
+            count = 1
             print("Goal succeeded!")
         elif result == NavigationResult.CANCELED:
             print("Goal was canceled!")
@@ -142,9 +142,10 @@ class Go_to_Destination:
         else:
             print("Goal has an invalid return status!")
 
-        navigator.lifecycleShutdown()
+    
+        # navigator.lifecycleShutdown()
 
-        exit(0)
+        # exit(0)
 
 
 class BackToStation:
@@ -250,9 +251,9 @@ class BackToStation:
         else:
             print("Goal has an invalid return status!")
 
-        navigator.lifecycleShutdown()
+        # navigator.lifecycleShutdown()
 
-        exit(0)
+        # exit(0)
 
 
 class GotoGoal(Node):
@@ -296,12 +297,10 @@ class Bridge_to_Web_CPR(Node):
         ## 목적지에 도착 했을 때
         self.publisher = self.create_publisher(Bridge, "arrive_dest", 10)
 
-        # if BasicNavigator.getResult == 1:
+        if BasicNavigator.getResult == 1:
 
-        timer_period = 1
-        
-        
-        self.timer = self.create_timer(timer_period, self.arrive_callback)
+            timer_period = 1
+            self.timer = self.create_timer(timer_period, self.arrive_callback)
         
 
         ## CPR, WEB 통신이 끝났을 때
@@ -314,9 +313,9 @@ class Bridge_to_Web_CPR(Node):
         global count
         msg = Bridge()
         msg.arrive_destination = True
-        if count==0:
+        if count == 1:
             self.publisher.publish(msg)
-        if count ==1:
+        if count == 2:
             msg.arrive_destination = False
             self.publisher.publish(msg)
         self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
@@ -336,6 +335,7 @@ class Bridge_to_Web_CPR(Node):
 
 
 def main(args=None):
+    global count
     # Start the ROS 2 Python Client Library
     rclpy.init(args=args)
 
@@ -343,7 +343,7 @@ def main(args=None):
     go_to_destination.set_initial_pose()
 
     # bridge 노드 실행
-
+    
     bridge = Bridge_to_Web_CPR()
 
     # Service 노드 실행
