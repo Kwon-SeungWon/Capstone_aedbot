@@ -39,20 +39,29 @@ class Sub(Node):
         )
 
         self.subscription_done = self.create_subscription(
-            FallDetectionToNav2,
+            Bridge,
             "arrive_dest",
             self.listener_callback_done,
             qos_profile,
         )
 
         self.state = False
+        self.callback_count = False  # callback이 두번 호출되는 것을 방지하기 위함
 
     def listener_callback_get_dest(self, msg):
-        # append and delete
+        if self.callback_count:
+            """
+            callback이 두번 호출되는 것을 방지하기 위함
+            """
+            return None
+
+        self.callback_count = True
         get_face(self)
 
     def listener_callback_done(self, msg):
-        # append and delete
+        """
+        state가 True가 되면 get_face() 함수가 종료됨
+        """
         self.state = True
 
 
