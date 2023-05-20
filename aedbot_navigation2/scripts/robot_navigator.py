@@ -293,11 +293,6 @@ class BasicNavigator(Node):
             self.info("Change map request was successful!")
         return
 
-    def clear_periodically_costmap(self, period):
-        clear_period = period
-        self.clear = self.create_timer(clear_period, self.clearAllCostmaps())
-        return
-
     def clearAllCostmaps(self):
         self.clearLocalCostmap()
         self.clearGlobalCostmap()

@@ -50,7 +50,7 @@ def generate_launch_description():
     return launch.LaunchDescription([
         nav2_launch,
         timer_action,
-        timer_action2
+        #timer_action2
         #timer_action3
     ])
 
