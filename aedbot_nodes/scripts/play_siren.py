@@ -45,7 +45,7 @@ class Sub(Node):
 
 def main():
     os.system("sudo pulseaudio -k")
-    os.system("pactl -- set-sink-volume 0 200%")
+    os.system("pactl -- set-sink-volume 0 50%") #200%
     os.system("pulseaudio --start")
     rclpy.init()
     node = Sub()
