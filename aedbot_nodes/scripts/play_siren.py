@@ -30,6 +30,7 @@ class Sub(Node):
         self.nav_start = False
 
     def listener_callback_predict(self, msg):
+        msg = Bridge()
         if msg.arrive_destination is True:
             self.nav_done = True
 
