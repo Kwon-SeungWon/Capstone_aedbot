@@ -39,6 +39,7 @@ setup(
             "imu_subscriber = scripts.imu_subscriber:main",
             "get_dest = scripts.get_dest:main",
             "test_sub = scripts.test_sub:main",
+            "test_pub_dest = scripts.test_pub_dest:main",
             "play_siren = scripts.play_siren:main",
             "HRI = scripts.HRI:main",
             "cpr_node = scripts.cpr_node:main",
