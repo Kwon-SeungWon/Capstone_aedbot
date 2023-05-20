@@ -47,8 +47,6 @@ def generate_launch_description():
 
     nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
 
-    # 특정 Python 파일들의 실행을 추가합니다.
-
     package_name='aedbot_navigation2'
 
     return LaunchDescription([
@@ -73,14 +71,14 @@ def generate_launch_description():
                 'map': map_dir,
                 'use_sim_time': use_sim_time,
                 'params_file': param_dir}.items(),
-        ),
-
-        Node(
-            package=package_name,
-            executable='go_to_goal.py',
-            output='screen',
-            name='go_to_goal'
         )
+
+        # Node(
+        #     package=package_name,
+        #     executable='go_to_goal.py',
+        #     output='screen',
+        #     name='go_to_goal'
+        # )
 
         # IncludeLaunchDescription(
         #     PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/navigation2_rviz.launch.py'])
