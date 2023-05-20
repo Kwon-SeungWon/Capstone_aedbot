@@ -104,6 +104,15 @@ class Go_to_Destination:
             # Implement some code here for your application!
             #
             ################################################
+            navigator.clear_periodically_costmap(1)
+
+            result = navigator.getResult()
+            global count
+            count = 0
+
+            if result == NavigationResult.SUCCEEDED:
+                count = 1
+                print("Goal succeeded!")
 
             # Do something with the feedback
             i = i + 1
@@ -130,8 +139,6 @@ class Go_to_Destination:
 
         # Do something depending on the return code
         result = navigator.getResult()
-        global count
-        count = 0
         if result == NavigationResult.SUCCEEDED:
             count = 1
             print("Goal succeeded!")
@@ -143,9 +150,12 @@ class Go_to_Destination:
             print("Goal has an invalid return status!")
 
     
-        # navigator.lifecycleShutdown()
+        navigator.lifecycleShutdown()
+        count =1
+        print(count)
+        #exit(0)
 
-        # exit(0)
+        return count
 
 
 class BackToStation:
@@ -297,7 +307,7 @@ class Bridge_to_Web_CPR(Node):
         ## 목적지에 도착 했을 때
         self.publisher = self.create_publisher(Bridge, "arrive_dest", 10)
 
-        if BasicNavigator.getResult == 1:
+        if BasicNavigator.getResult or count == 1:
 
             timer_period = 1
             self.timer = self.create_timer(timer_period, self.arrive_callback)

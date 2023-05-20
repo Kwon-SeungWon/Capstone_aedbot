@@ -31,12 +31,12 @@ def generate_launch_description():
         name='cpr_node'
     ))
 
-    actions.append(launch_ros.actions.Node(
-        package=package_name,
-        executable='get_dest',
-        output='screen',
-        name='get_dest'
-    ))
+    # actions.append(launch_ros.actions.Node(
+    #     package=package_name,
+    #     executable='get_dest',
+    #     output='screen',
+    #     name='get_dest'
+    # ))
 
     actions.append(launch_ros.actions.Node(
         package=package_name,

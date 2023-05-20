@@ -26,6 +26,11 @@ def generate_launch_description():
         output='screen'
     )
 
+    test_pub = launch.actions.ExecuteProcess(
+        cmd=[os.path.join(os.getcwd(), 'src', 'aedbot', 'aedbot_nodes', 'scripts', 'test_pub_dest')],
+        output='screen'
+    )
+
     # TimerAction을 사용하여 시간 간격을 두고 nav2_rviz_launch를 실행합니다.
     timer_action = launch.actions.TimerAction(
         period=3.0,  # 시간 간격을 설정합니다. 여기서는 5초로 설정했습니다.
@@ -37,10 +42,16 @@ def generate_launch_description():
         actions=[go_to_goal]  # 두 번째 액션을 실행합니다.
     )
 
+    timer_action3 = launch.actions.TimerAction(
+        period=4.0,  # 두 번째 액션(file2_launch)의 시간 간격을 설정합니다. 여기서는 10초로 설정했습니다.
+        actions=[test_pub]  # 두 번째 액션을 실행합니다.
+    )
+
     return launch.LaunchDescription([
         nav2_launch,
         timer_action,
         timer_action2
+        #timer_action3
     ])
 
 
