@@ -87,7 +87,7 @@ bt_navigator_rclcpp_node:
 controller_server:
   ros__parameters:
     use_sim_time: False
-    controller_frequency: 10.0
+    controller_frequency: 2.0
     min_x_velocity_threshold: 0.001
     min_y_velocity_threshold: 0.5
     min_theta_velocity_threshold: 0.001
@@ -101,13 +101,13 @@ controller_server:
       min_vel_y: 0.0
       max_vel_x: 0.2
       max_vel_y: 0.0
-      max_vel_theta: 0.10 #3.0
+      max_vel_theta: 0.12 #0.1
       min_speed_xy: 0.0
       max_speed_xy: 0.15
       min_speed_theta: 0.0
       acc_lim_x: 0.4
       acc_lim_y: 0.0
-      acc_lim_theta: 0.1
+      acc_lim_theta: 0.1 #0.1
       decel_lim_x: -0.4
       decel_lim_y: 0.0
       decel_lim_theta: -0.1
@@ -156,7 +156,7 @@ local_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
         
         # 장애물에서 0-cost point가 얼마나 먼지 
-        infation_radius: 1.0 #0.55   
+        infation_radius: 3.0 #0.55   
         
         # cell의 코스트에 반비례
         cost_scaling_factor: 10.0 #5.0
@@ -241,7 +241,7 @@ global_costmap:
         plugin: "nav2_costmap_2d::InflationLayer"
 
         # 장애물에서 0-cost point가 얼마나 먼지 
-        infation_radius: 1.0 #1.75     #터틀봇: 1.0
+        infation_radius: 3.0 #1.75     #터틀봇: 1.0
         
         # cell의 코스트에 반비례
         cost_scaling_factor: 10.0 #2.58   #터틀봇: 0.55
@@ -287,7 +287,7 @@ recoveries_server:
   ros__parameters:
     costmap_topic: local_costmap/costmap_raw
     footprint_topic: local_costmap/published_footprint
-    cycle_frequency: 10.0
+    cycle_frequency: 20.0
     recovery_plugins: ["spin", "backup", "wait"]
     spin:
       plugin: "nav2_recoveries/Spin"
@@ -300,9 +300,9 @@ recoveries_server:
     transform_timeout: 0.1
     use_sim_time: False
     simulate_ahead_time: 2.0
-    max_rotational_vel: 0.1
-    min_rotational_vel: 0.05
-    rotational_acc_lim: 0.4 #3.2
+    max_rotational_vel: 0.2
+    min_rotational_vel: 0.1
+    rotational_acc_lim: 1.0 #3.2
 
 robot_state_publisher:
   ros__parameters:
