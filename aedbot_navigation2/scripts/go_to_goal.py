@@ -21,23 +21,6 @@ class Go_to_Destination:
         # Launch the ROS 2 Navigation Stack
         navigator = BasicNavigator()
 
-        # Set the robot's initial pose if necessary
-        # initial_poses = []
-        # initial_pose = PoseStamped()
-        # initial_pose.header.frame_id = "map"
-        # initial_pose.header.stamp = navigator.get_clock().now().to_msg()
-        # initial_pose.pose.position.x = 0.0
-        # initial_pose.pose.position.y = 0.0
-        # initial_pose.pose.position.z = 0.0
-        # initial_pose.pose.orientation.x = 0.0
-        # initial_pose.pose.orientation.y = 0.0
-        # initial_pose.pose.orientation.z = 0.0
-        # initial_pose.pose.orientation.w = 1.0
-        # self.initial_pose = initial_poses.append(initial_pose)
-        # navigator.setInitialPose(initial_pose)
-
-        # Position(-0.868823, -0.701858, 0), Orientation(0, 0, 0.00289794, 0.999996) = Angle: 0.00579588
-
         initial_poses = []
         initial_pose = PoseStamped()
         initial_pose.header.frame_id = "map"
@@ -53,27 +36,18 @@ class Go_to_Destination:
         navigator.setInitialPose(initial_pose)
 
         # Wait for navigation to fully activate. Use this line if autostart is set to true.
-        navigator.waitUntilNav2Active()
+        navigator.lifecycleStartup()
+        #navigator.waitUntilNav2Active()
 
-        # If desired, you can change or load the map as well
-        # navigator.changeMap('/path/to/map.yaml')
-
-        # You may use the navigator to clear or obtain costmaps
-        #####################################################
-
-        # 주기적으로 local, global costmap clear (5s 마다)
-        navigator.clear_periodically_costmap(5)
-
-        navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
-        # global_costmap = navigator.getGlobalCostmap()
-        # local_costmap = navigator.getLocalCostmap()
-        ######################################################
-
+        navigator.clearAllCostmaps()  
 
     def go_to_destination(self):
 
         navigator = BasicNavigator()
+
+        # 주기적으로 local, global costmap clear (5s 마다)
         navigator.clear_periodically_costmap(3)
+
         go = GotoGoal()
 
         goal_poses = []
@@ -139,6 +113,7 @@ class Go_to_Destination:
 
         # Do something depending on the return code
         result = navigator.getResult()
+        
         if result == NavigationResult.SUCCEEDED:
             count = 1
             print("Goal succeeded!")
@@ -150,12 +125,11 @@ class Go_to_Destination:
             print("Goal has an invalid return status!")
 
     
-        navigator.lifecycleShutdown()
+        # navigator.lifecycleShutdown()
         count =1
         print(count)
-        #exit(0)
 
-        return count
+        # exit(0)
 
 
 class BackToStation:
@@ -307,7 +281,7 @@ class Bridge_to_Web_CPR(Node):
         ## 목적지에 도착 했을 때
         self.publisher = self.create_publisher(Bridge, "arrive_dest", 10)
 
-        if BasicNavigator.getResult or count == 1:
+        if BasicNavigator.getResult or count== 1:
 
             timer_period = 1
             self.timer = self.create_timer(timer_period, self.arrive_callback)
