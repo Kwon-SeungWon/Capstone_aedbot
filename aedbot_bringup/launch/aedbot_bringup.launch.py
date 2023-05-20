@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-# Author: Bishop Pearson
+
+##########################################################################
+### This is for BringUp mcu, lidar, imu, description(urdf), ekf filter ###
+##########################################################################
 
 import os
 
@@ -45,6 +48,16 @@ def generate_launch_description():
     'aedbot_description_dir',
     default=os.path.join(
       get_package_share_directory('aedbot_description'),
+      'launch'
+    )
+  )
+
+  ## aedbot_nodes의 파일들 bringup
+
+  aedbot_nodes = LaunchConfiguration(
+    'aedbot_nodes',
+    default=os.path.join(
+      get_package_share_directory('aedbot_nodes'),
       'launch'
     )
   )
@@ -94,5 +107,9 @@ def generate_launch_description():
     IncludeLaunchDescription(
       PythonLaunchDescriptionSource([aedbot_description_dir, '/aedbot_state_publisher.launch.py']),
       launch_arguments={'use_sim_time': use_sim_time}.items(),
+    ),
+
+    IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([aedbot_nodes, '/aedbot_nodes.launch.py']),
     ),
   ])
