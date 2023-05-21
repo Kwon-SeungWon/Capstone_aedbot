@@ -75,8 +75,8 @@ def main(args=None):
     node = Sub()
 
     if args.debug:
-        node.state = True
-        get_face(node)
+        node.callback_count = True
+        node.listener_callback_get_dest()
 
     rclpy.spin(node)
 
