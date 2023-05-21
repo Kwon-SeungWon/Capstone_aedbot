@@ -43,6 +43,7 @@ setup(
             "play_siren = scripts.play_siren:main",
             "HRI = scripts.HRI:main",
             "cpr_node = scripts.cpr_node:main",
+            "bridge_node = scripts.bridge_node:main",
         ],
     },
 )

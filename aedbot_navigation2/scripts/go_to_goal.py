@@ -28,7 +28,11 @@ class Sub_dest_val_Go_to_Destination(Node):
             FallDetectionToNav2, "dest_val", self.dest_val_callback, 10
         )
         self.subscription
-  
+
+        self.publisher_ = self.create_publisher(
+            Bridge, "arrive_dest_bridge", 10
+        ) 
+
     def dest_val_callback(self, destination: FallDetectionToNav2):
         
         self.get_logger().info(
@@ -127,7 +131,12 @@ class Sub_dest_val_Go_to_Destination(Node):
         result = navigator.getResult()
         if result == NavigationResult.SUCCEEDED:
             print('Goal succeeded!')
+
             Sub_dest_val_Go_to_Destination.flag = 1
+            to_bridge = Bridge()
+            to_bridge.nav2_bridge = True
+            self.publisher_.publish(to_bridge)
+            
             print(Sub_dest_val_Go_to_Destination.flag)
         elif result == NavigationResult.CANCELED:
             print('Goal was canceled!')
@@ -139,48 +148,19 @@ class Sub_dest_val_Go_to_Destination(Node):
         # Shut down the ROS 2 Navigation Stack
         navigator.lifecycleShutdown()
 
-class Bridge_to_Web_CPR(Node):
+class Go_to_Station(Node):
+    
     def __init__(self):
-        
-        super().__init__("Bridge_Node")
-
-        ## 목적지에 도착 했을 때
-        self.publisher = self.create_publisher(Bridge, "arrive_dest", 10)
-
-        ## CPR, WEB 통신이 끝났을 때
+        super().__init__("Go_to_Station")
         self.subscription = self.create_subscription(
-            Int32, "situation_end", self.end_callback, 10  # CHANGE
+            Bridge, "arrive_dest_bridge", self.end_callback, 10
         )
         self.subscription
 
-        ## 목적지 도착 후 flag = 1 상태에서 arrive_callback 1초마다 호출
-        if Sub_dest_val_Go_to_Destination.flag == 1:
-            print("162 flag")
-            timer_period = 1
-            self.timer = self.create_timer(timer_period, self.arrive_callback)
-        
-
-    def arrive_callback(self):
-        global flag
-        print("arrive callback")
+    def end_callback(self, msg: Bridge):
         msg = Bridge()
-        msg.arrive_destination = True
-        self.publisher.publish(msg)
-        
-        if Sub_dest_val_Go_to_Destination.flag == 2:
-            msg.arrive_destination = False
-            self.publisher.publish(msg)
 
-        self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
-
-
-        # if self.i == 5:
-        #     exit(0)
-
-    def end_callback(self, msg: Int32):
-
-        if msg.data == 1:
-            Sub_dest_val_Go_to_Destination.flag = 2 
+        if msg.bridge_nav2 == True:
             # Launch the ROS 2 Navigation Stack
             navigator = BasicNavigator()
           
@@ -262,7 +242,6 @@ class Bridge_to_Web_CPR(Node):
             result = navigator.getResult()
             if result == NavigationResult.SUCCEEDED:
                 print('Goal succeeded!')
-                flag = 3
                 print('ENDENDENDENDENDENDENDEND')
             elif result == NavigationResult.CANCELED:
                 print('Goal was canceled!')
@@ -281,16 +260,16 @@ def main(args=None):
     rclpy.init(args=args)
 
     sub_dest_val_go_to_destination = Sub_dest_val_Go_to_Destination()
-    bridge = Bridge_to_Web_CPR()
+    go_to_station = Go_to_Station()
 
     rclpy.spin(sub_dest_val_go_to_destination)
-    rclpy.spin(bridge)
+    rclpy.spin(go_to_station)
     
     sub_dest_val_go_to_destination.destroy_node()
-    bridge.destroy_node()
+    go_to_station.destroy_node()
 
     rclpy.shutdown()
 
 
 if __name__ == '__main__':
-  main()
+    main()
