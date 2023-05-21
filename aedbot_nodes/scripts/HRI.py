@@ -6,6 +6,8 @@ import time
 import subprocess
 from rclpy.qos import QoSProfile
 import argparse
+from multiprocessing import Process, Value
+from functools import partial
 
 from aedbot_interfaces.msg import FallDetectionToNav2, Bridge
 
@@ -17,11 +19,30 @@ parser.add_argument("--debug", action="store_true", help="debug mode")
 args = parser.parse_args()
 
 
+def Arrive_sub(v):
+    qos_profile = QoSProfile(depth=10)
+
+    Node.create_subscription(
+        Bridge,
+        "arrive_dest",
+        partial(sub_callback_done, v=v),
+        qos_profile,
+    )
+
+
+def sub_callback_done(msg, v):
+    """
+    state가 True가 되면 get_face() 함수가 종료됨
+    """
+    print("get_sub")
+    v.value = True
+
+
 def get_face(self):
     # launch firefox in a subprocess
     p = subprocess.Popen(["firefox", URL, "--kiosk"])
 
-    while True:  # TODO: state가 while문 안에서 바뀌는지 확인
+    while True:
         print(self.state)
         if self.state:
             break
@@ -44,14 +65,6 @@ class Sub(Node):
             qos_profile,
         )
 
-        self.subscription_done = self.create_subscription(
-            Bridge,
-            "arrive_dest",
-            self.listener_callback_done,
-            qos_profile,
-        )
-
-        self.state = False
         self.callback_count = False  # callback이 두번 호출되는 것을 방지하기 위함
 
     def listener_callback_get_dest(self, msg):
@@ -64,17 +77,15 @@ class Sub(Node):
         self.callback_count = True
         get_face(self)
 
-    def listener_callback_done(self, msg):
-        """
-        state가 True가 되면 get_face() 함수가 종료됨
-        """
-        print('get_sub')
-        self.state = True
-
 
 def main():
+    v = Value("B", False)
+    p = Process(target=Arrive_sub, v=v)
+    p.start()
+
     rclpy.init()
     node = Sub()
+    node.state = v.value
 
     # if args.debug:
     #     node.listener_callback_get_dest(msg=None)
