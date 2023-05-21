@@ -21,7 +21,7 @@ class Bridge_to_Web_CPR(Node):
         self.subscription
 
         # bridge에서 CPR, WEB으로 도착신호 보낼 때
-        # Topic은 arriv_dest
+        # Topic은 arrive_dest
         # msg는 Bridge의 arrive_destination이 True
         self.publisher_to_CPR = self.create_publisher(Bridge, "arrive_dest", 10)
 
@@ -38,12 +38,16 @@ class Bridge_to_Web_CPR(Node):
         # msg는 Bridge의 bridge_to_nav2
         self.publisher_to_nav2 = self.create_publisher(Bridge, "arrive_dest_bridge", 10)
 
-    
+    int32 bridge_to_cpr
     def arrive_callback(self, msg:Bridge):
 
         #msg = Bridge()
+        self.nav2_to_bridge = msg.nav2_to_bridge
 
-        if msg.nav2_to_bridge == True:
+        if msg.bridge_to_cpr:
+            self.nav2_to_bridge ==False
+            
+        if self.nav2_to_bridge == True:
             
             print("arrive callback")
             # msg.nav2_to_bridge = True
@@ -62,7 +66,7 @@ class Bridge_to_Web_CPR(Node):
     def end_callback(self, msg:Bridge):
         #msg = Bridge()
         print("end callback")
-        if msg.complete_cpr == 1 or msg.complete_web == True:
+        if msg.bridge_to_cpr == 1 or msg.complete_web == True:
 
             msg.bridge_to_nav2 = True
             self.publisher_to_nav2.publish(msg)
