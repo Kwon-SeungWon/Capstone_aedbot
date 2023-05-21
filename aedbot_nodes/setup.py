@@ -44,6 +44,7 @@ setup(
             "HRI = scripts.HRI:main",
             "cpr_node = scripts.cpr_node:main",
             "bridge_node = scripts.bridge_node:main",
+            "facetime = scripts.facetime:main"
         ],
     },
 )

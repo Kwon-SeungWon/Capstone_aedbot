@@ -20,7 +20,7 @@ FACETIME_URL = "https://crov.site:8080/"
 QUIT_URL = "http://130.162.152.119/get_quit/"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("debug", type=bool, action="store_true", help="debug mode")
+parser.add_argument("--debug", action="store_true", help="debug mode")
 args = parser.parse_args()
 
 
@@ -77,7 +77,7 @@ class Sub(Node):
 
         self.callback_count = False  # callback이 두번 호출되는 것을 방지하기 위함
 
-    def listener_callback_get_dest(self, msg):
+    def listener_callback_done(self, msg):
         if self.callback_count:
             """
             callback이 두번 호출되는 것을 방지하기 위함
@@ -93,7 +93,7 @@ def main():
     node = Sub()
 
     if args.debug:
-        node.listener_callback_get_dest(None)
+        node.listener_callback_done(None)
 
     rclpy.spin(node)
 
