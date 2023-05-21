@@ -38,7 +38,7 @@ class Bridge_to_Web_CPR(Node):
         # msg는 Bridge의 bridge_to_nav2
         self.publisher_to_nav2 = self.create_publisher(Bridge, "arrive_dest_bridge", 10)
 
-    int32 bridge_to_cpr
+    # int32 bridge_to_cpr
     def arrive_callback(self, msg:Bridge):
 
         #msg = Bridge()
@@ -47,7 +47,7 @@ class Bridge_to_Web_CPR(Node):
         if msg.bridge_to_cpr:
             self.nav2_to_bridge ==False
             
-        if self.nav2_to_bridge == True:
+        #if self.nav2_to_bridge == True:
             
         self.cpr_state: bool = False
         self.web_state: bool = False
