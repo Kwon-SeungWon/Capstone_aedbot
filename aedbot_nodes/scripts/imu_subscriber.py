@@ -7,7 +7,7 @@ from std_msgs.msg import Int32
 from std_msgs.msg import Int16
 from std_msgs.msg import Bool
 from aedbot_interfaces.msg import Bridge
-
+import os
 import time
 from playsound import playsound
 
@@ -46,9 +46,12 @@ class ImuSubscriberNode(Node):
 
     def imu_callback(self, msg: Imu):
         # self.k= Bool.data
-        # self.get_logger().info('self.k:%s' %type(self.k))
-        #print("imu_callback Complete")
-        #playsound("/root/catkin_ws/src/aedbot/aedbot_nodes/music/120bpm.mp3", True)
+        self.get_logger().info('self.k:%s' %type(msg.linear_acceleration))
+        print("imu_callback Complete")
+        os.system("sudo pulseaudio -k")
+        os.system("pactl -- set-sink-volume 0 50%")  # 200%
+        os.system("pulseaudio --start")        
+        playsound("/root/catkin_ws/src/aedbot/aedbot_nodes/music/120bpm.mp3", True)
 
         count_msg = Int32()
         #self.get_logger().info("count:%d" % count_msg.data)
