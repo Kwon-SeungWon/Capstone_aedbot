@@ -24,12 +24,12 @@ def generate_launch_description():
 
     # 특정 Python 파일들의 실행을 추가합니다.
 
-    actions.append(launch_ros.actions.Node(
-        package=package_name,
-        executable='cpr_node',
-        output='screen',
-        name='cpr_node'
-    ))
+    # actions.append(launch_ros.actions.Node(
+    #     package=package_name,
+    #     executable='cpr_node',
+    #     output='screen',
+    #     name='cpr_node'
+    # ))
 
     # actions.append(launch_ros.actions.Node(
     #     package=package_name,

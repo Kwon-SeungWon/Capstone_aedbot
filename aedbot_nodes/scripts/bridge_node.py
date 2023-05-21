@@ -35,18 +35,18 @@ class Bridge_to_Web_CPR(Node):
 
         # CPR, WEB 통신이 끝났을 때 bridge에서 nav2로 복귀신호
         # Topic은 arrive_dest_bridge
-        # msg는 Bridge의 
+        # msg는 Bridge의 bridge_to_nav2
         self.publisher_to_nav2 = self.create_publisher(Bridge, "arrive_dest_bridge", 10)
 
     
     def arrive_callback(self, msg:Bridge):
 
-        msg = Bridge()
+        #msg = Bridge()
 
-        if msg.nav2_bridge == True:
+        if msg.nav2_to_bridge == True:
             
             print("arrive callback")
-            msg.nav2_bridge = True
+            # msg.nav2_to_bridge = True
             msg.arrive_destination = True
             self.publisher_to_CPR.publish(msg)
             print(msg)
@@ -54,13 +54,14 @@ class Bridge_to_Web_CPR(Node):
         else:
             msg.arrive_destination = False
             self.publisher_to_CPR.publish(msg)
+            print(msg)
 
         self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
 
 
     def end_callback(self, msg:Bridge):
-        msg = Bridge()
-
+        #msg = Bridge()
+        print("end callback")
         if msg.complete_cpr == 1 or msg.complete_web == True:
 
             msg.bridge_to_nav2 = True

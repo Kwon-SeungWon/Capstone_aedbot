@@ -32,7 +32,7 @@ class Sub_dest_val_Go_to_Destination(Node):
         self.publisher_ = self.create_publisher(
             Bridge, "arrive_dest_bridge", 10
         ) 
-
+        self.should_exit = False
     def dest_val_callback(self, destination: FallDetectionToNav2):
         
         self.get_logger().info(
@@ -78,10 +78,10 @@ class Sub_dest_val_Go_to_Destination(Node):
         # navigator.changeMap('/path/to/map.yaml')
       
         # You may use the navigator to clear or obtain costmaps
-        navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
+        #navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
         # global_costmap = navigator.getGlobalCostmap()
         # local_costmap = navigator.getLocalCostmap()
-        navigator.clearCostmapsPeriodically(3)
+        
         # Set the robot's goal pose
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = 'map'
@@ -109,7 +109,7 @@ class Sub_dest_val_Go_to_Destination(Node):
           # Implement some code here for your application!
           #
           ################################################
-          #navigator.clear_periodically_costmap()
+          #navigator.clearCostmapsPeriodically(3)
           print('clear')
           # Do something with the feedback
           i = i + 1
@@ -129,15 +129,19 @@ class Sub_dest_val_Go_to_Destination(Node):
       
         # Do something depending on the return code
         result = navigator.getResult()
+
+        
         if result == NavigationResult.SUCCEEDED:
             print('Goal succeeded!')
 
-            Sub_dest_val_Go_to_Destination.flag = 1
-            to_bridge = Bridge()
-            to_bridge.nav2_bridge = True
-            self.publisher_.publish(to_bridge)
+            msg = Bridge()
+            msg.nav2_to_bridge = True
+            self.publisher_.publish(msg)
             
-            print(Sub_dest_val_Go_to_Destination.flag)
+            print(msg)
+            navigator.lifecycleShutdown()
+            self.should_exit = True
+            
         elif result == NavigationResult.CANCELED:
             print('Goal was canceled!')
         elif result == NavigationResult.FAILED:
@@ -146,8 +150,9 @@ class Sub_dest_val_Go_to_Destination(Node):
             print('Goal has an invalid return status!')
       
         # Shut down the ROS 2 Navigation Stack
-        navigator.lifecycleShutdown()
-
+        
+        
+        
 class Go_to_Station(Node):
     
     def __init__(self):
@@ -157,10 +162,12 @@ class Go_to_Station(Node):
         )
         self.subscription
 
-    def end_callback(self, msg: Bridge):
-        msg = Bridge()
+    def end_callback(self, msg:Bridge):
+        #msg = Bridge()
+        print('end_callback')
 
-        if msg.bridge_nav2 == True:
+        if msg.bridge_to_nav2 == True:
+            print('Lets go')
             # Launch the ROS 2 Navigation Stack
             navigator = BasicNavigator()
           
@@ -180,10 +187,10 @@ class Go_to_Station(Node):
             # Activate navigation, if not autostarted. This should be called after setInitialPose()
             # or this will initialize at the origin of the map and update the costmap with bogus readings.
             # If autostart, you should `waitUntilNav2Active()` instead.
-            #navigator.lifecycleStartup()
+            navigator.lifecycleStartup()
           
             # Wait for navigation to fully activate. Use this line if autostart is set to true.
-            navigator.waitUntilNav2Active()
+            #navigator.waitUntilNav2Active()
           
             # If desired, you can change or load the map as well
             # navigator.changeMap('/path/to/map.yaml')
@@ -255,21 +262,28 @@ class Go_to_Station(Node):
           
 
 
-def main(args=None):
+def main1(args=None):
     # Start the ROS 2 Python Client Library
     rclpy.init(args=args)
-
     sub_dest_val_go_to_destination = Sub_dest_val_Go_to_Destination()
-    go_to_station = Go_to_Station()
-
-    rclpy.spin(sub_dest_val_go_to_destination)
-    rclpy.spin(go_to_station)
     
+    while rclpy.ok() and not sub_dest_val_go_to_destination.should_exit:
+        rclpy.spin_once(sub_dest_val_go_to_destination)
+        
     sub_dest_val_go_to_destination.destroy_node()
-    go_to_station.destroy_node()
-
     rclpy.shutdown()
+
+def main2(args=None):
+    # Start the ROS 2 Python Client Library
+    rclpy.init(args=args)
+    go_to_station = Go_to_Station()
+    rclpy.spin(go_to_station)
+    go_to_station.destroy_node()
+    rclpy.shutdown()
+    #rclpy.init(args=args)
+    
 
 
 if __name__ == '__main__':
-    main()
+    main1()
+    main2()
