@@ -15,7 +15,7 @@ from aedbot_interfaces.msg import Bridge
 TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
 KST = timezone("Asia/Seoul")
 
-FACETIME_URL = "http://xxx.xxx.xxx.xxx/"  # TODO: 추후 수정
+FACETIME_URL = "https://crov.site:8080/"
 QUIT_URL = "http://130.162.152.119/get_quit/"
 
 
