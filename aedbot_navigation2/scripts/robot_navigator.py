@@ -1,6 +1,8 @@
 #! /usr/bin/env python3
 import time
 from enum import Enum
+import asyncio
+
 
 from action_msgs.msg import GoalStatus
 from geometry_msgs.msg import PoseStamped
@@ -293,26 +295,31 @@ class BasicNavigator(Node):
             self.info("Change map request was successful!")
         return
 
-    def clearAllCostmaps(self):
-        self.clearLocalCostmap()
-        self.clearGlobalCostmap()
-        return
+    def clearCostmapsPeriodically(self, interval_sec):
+        asyncio.ensure_future(self.clearCostmapsLoop(interval_sec))
 
-    def clearLocalCostmap(self):
-        while not self.clear_costmap_local_srv.wait_for_service(timeout_sec=1.0):
+    async def clearCostmapsLoop(self, interval_sec):
+        while True:
+            await self.clearAllCostmaps()
+            await asyncio.sleep(interval_sec)
+
+    async def clearAllCostmaps(self):
+        await self.clearLocalCostmap()
+        await self.clearGlobalCostmap()
+
+    async def clearLocalCostmap(self):
+        if await self.clear_costmap_local_srv.wait_for_service(timeout_sec=1.0):
+            req = ClearEntireCostmap.Request()
+            await self.clear_costmap_local_srv.call_async(req)
+        else:
             self.info("Clear local costmaps service not available, waiting...")
-        req = ClearEntireCostmap.Request()
-        future = self.clear_costmap_local_srv.call_async(req)
-        rclpy.spin_until_future_complete(self, future)
-        return
 
-    def clearGlobalCostmap(self):
-        while not self.clear_costmap_global_srv.wait_for_service(timeout_sec=1.0):
+    async def clearGlobalCostmap(self):
+        if await self.clear_costmap_global_srv.wait_for_service(timeout_sec=1.0):
+            req = ClearEntireCostmap.Request()
+            await self.clear_costmap_global_srv.call_async(req)
+        else:
             self.info("Clear global costmaps service not available, waiting...")
-        req = ClearEntireCostmap.Request()
-        future = self.clear_costmap_global_srv.call_async(req)
-        rclpy.spin_until_future_complete(self, future)
-        return
 
     def getGlobalCostmap(self):
         while not self.get_costmap_global_srv.wait_for_service(timeout_sec=1.0):

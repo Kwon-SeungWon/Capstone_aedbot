@@ -14,9 +14,9 @@ from std_msgs.msg import Int32
 Navigates a robot from an initial pose to a goal pose.
 '''
 
-flag = 0
 
 class Sub_dest_val_Go_to_Destination(Node):
+    flag = 0
     destination_x = 0.0
     destination_y = 0.0
     destination_z = 0.0
@@ -30,8 +30,6 @@ class Sub_dest_val_Go_to_Destination(Node):
         self.subscription
   
     def dest_val_callback(self, destination: FallDetectionToNav2):
-        
-        global flag
         
         self.get_logger().info(
             "Incoming Destination is \nx: %f\n y: %f\n z: %f\n w: %f\n"
@@ -79,7 +77,7 @@ class Sub_dest_val_Go_to_Destination(Node):
         navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
         # global_costmap = navigator.getGlobalCostmap()
         # local_costmap = navigator.getLocalCostmap()
-      
+        navigator.clearCostmapsPeriodically(3)
         # Set the robot's goal pose
         goal_pose = PoseStamped()
         goal_pose.header.frame_id = 'map'
@@ -129,8 +127,8 @@ class Sub_dest_val_Go_to_Destination(Node):
         result = navigator.getResult()
         if result == NavigationResult.SUCCEEDED:
             print('Goal succeeded!')
-            flag = 1
-            print('dfasddddddddddddddddddddddddd')
+            Sub_dest_val_Go_to_Destination.flag = 1
+            print(Sub_dest_val_Go_to_Destination.flag)
         elif result == NavigationResult.CANCELED:
             print('Goal was canceled!')
         elif result == NavigationResult.FAILED:
@@ -140,13 +138,9 @@ class Sub_dest_val_Go_to_Destination(Node):
       
         # Shut down the ROS 2 Navigation Stack
         navigator.lifecycleShutdown()
-      
-        exit(0)
 
 class Bridge_to_Web_CPR(Node):
     def __init__(self):
-        
-        global flag
         
         super().__init__("Bridge_Node")
 
@@ -160,18 +154,20 @@ class Bridge_to_Web_CPR(Node):
         self.subscription
 
         ## 목적지 도착 후 flag = 1 상태에서 arrive_callback 1초마다 호출
-        if flag == 1:
+        if Sub_dest_val_Go_to_Destination.flag == 1:
+            print("162 flag")
             timer_period = 1
             self.timer = self.create_timer(timer_period, self.arrive_callback)
         
 
     def arrive_callback(self):
         global flag
+        print("arrive callback")
         msg = Bridge()
         msg.arrive_destination = True
         self.publisher.publish(msg)
         
-        if flag == 2:
+        if Sub_dest_val_Go_to_Destination.flag == 2:
             msg.arrive_destination = False
             self.publisher.publish(msg)
 
@@ -181,11 +177,10 @@ class Bridge_to_Web_CPR(Node):
         # if self.i == 5:
         #     exit(0)
 
-    def end_callback(self, msg: Bridge):
-        global flag
+    def end_callback(self, msg: Int32):
 
-        if msg.complete_cpr or msg.complete_web == True:
-            flag = 2 
+        if msg.data == 1:
+            Sub_dest_val_Go_to_Destination.flag = 2 
             # Launch the ROS 2 Navigation Stack
             navigator = BasicNavigator()
           
@@ -214,10 +209,10 @@ class Bridge_to_Web_CPR(Node):
             # navigator.changeMap('/path/to/map.yaml')
           
             # You may use the navigator to clear or obtain costmaps
-            navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
+            #navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
             # global_costmap = navigator.getGlobalCostmap()
             # local_costmap = navigator.getLocalCostmap()
-          
+            navigator.clearCostmapsPeriodically(3)
             # Set the robot's goal pose
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = 'map'
@@ -279,8 +274,6 @@ class Bridge_to_Web_CPR(Node):
             # Shut down the ROS 2 Navigation Stack
             navigator.lifecycleShutdown()
           
-            exit(0)
-            
 
 
 def main(args=None):
