@@ -80,7 +80,7 @@ class Sub(Node):
 
 def main():
     v = Value("B", False)
-    p = Process(target=Arrive_sub, args=v)
+    p = Process(target=Arrive_sub, v=v)
     p.start()
 
     rclpy.init()
