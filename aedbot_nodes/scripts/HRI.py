@@ -22,6 +22,7 @@ def get_face(self):
     p = subprocess.Popen(["firefox", URL, "--kiosk"])
 
     while True:  # TODO: state가 while문 안에서 바뀌는지 확인
+        print(self.state)
         if self.state:
             break
 
@@ -67,6 +68,7 @@ class Sub(Node):
         """
         state가 True가 되면 get_face() 함수가 종료됨
         """
+        print('get_sub')
         self.state = True
 
 
@@ -74,8 +76,8 @@ def main():
     rclpy.init()
     node = Sub()
 
-    if args.debug:
-        node.listener_callback_get_dest(msg=None)
+    # if args.debug:
+    #     node.listener_callback_get_dest(msg=None)
 
     rclpy.spin(node)
 
