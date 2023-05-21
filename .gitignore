@@ -4,3 +4,4 @@ build/
 install/
 log/
 .vscode/
+.DS_Store

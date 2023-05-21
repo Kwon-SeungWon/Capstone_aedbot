@@ -8,6 +8,7 @@ import subprocess
 from rclpy.qos import QoSProfile
 import datetime
 from pytz import timezone  # pip3 install pytz
+import argparse
 
 from aedbot_interfaces.msg import Bridge
 
@@ -15,8 +16,12 @@ from aedbot_interfaces.msg import Bridge
 TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
 KST = timezone("Asia/Seoul")
 
-FACETIME_URL = "http://xxx.xxx.xxx.xxx/"  # TODO: 추후 수정
+FACETIME_URL = "https://crov.site:8080/"
 QUIT_URL = "http://130.162.152.119/get_quit/"
+
+parser = argparse.ArgumentParser()
+parser.add_argument("debug", type=bool, action="store_true", help="debug mode")
+args = parser.parse_args()
 
 
 def check_quit(seconds: float) -> bool:
@@ -53,6 +58,7 @@ def connect_facetime():
         time.sleep(0.1)
 
     # TODO: 영상통화 끝났다는 것 pub
+
     p.terminate()
     return None
 
@@ -82,9 +88,12 @@ class Sub(Node):
         connect_facetime()
 
 
-def main(args=None):
-    rclpy.init(args=args)
+def main():
+    rclpy.init()
     node = Sub()
+
+    if args.debug:
+        node.listener_callback_get_dest(None)
 
     rclpy.spin(node)
 
