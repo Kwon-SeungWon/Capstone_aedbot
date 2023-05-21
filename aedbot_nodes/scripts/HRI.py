@@ -13,7 +13,7 @@ from aedbot_interfaces.msg import FallDetectionToNav2, Bridge
 URL = "http://130.162.152.119/HRI"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("debug", type=bool, action="store_true", help="debug mode")
+parser.add_argument("--debug", action="store_true", help="debug mode")
 args = parser.parse_args()
 
 
@@ -70,13 +70,12 @@ class Sub(Node):
         self.state = True
 
 
-def main(args=None):
-    rclpy.init(args=args)
+def main():
+    rclpy.init()
     node = Sub()
 
     if args.debug:
-        node.callback_count = True
-        node.listener_callback_get_dest()
+        node.listener_callback_get_dest(msg=None)
 
     rclpy.spin(node)
 
