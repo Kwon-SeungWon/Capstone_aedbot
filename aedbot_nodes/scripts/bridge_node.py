@@ -72,7 +72,6 @@ class Bridge_to_Web_CPR(Node):
     def end_callback(self, msg: Bridge):
         # msg = Bridge()
         print("end callback")
-        if msg.bridge_to_cpr == 1 or msg.complete_web == True:
 
         if msg.complete_cpr == 1:
             self.cpr_state = True

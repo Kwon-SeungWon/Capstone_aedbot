@@ -18,24 +18,30 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--debug", action="store_true", help="debug mode")
 args = parser.parse_args()
 
+def run(state):
+    def arrive_sub(sub_node):
+        print('sub start')
+        sub = sub_node.create_subscription(
+            Bridge,
+            "arrive_dest",
+            sub_callback_done,
+            10,
+        )
 
-def Arrive_sub(v):
-    qos_profile = QoSProfile(depth=10)
 
-    Node.create_subscription(
-        Bridge,
-        "arrive_dest",
-        partial(sub_callback_done, v=v),
-        qos_profile,
-    )
+    def sub_callback_done(msg):
+        """
+        state가 True가 되면 get_face() 함수가 종료됨
+        """
+        print("get_sub")
+        state.value = True
 
-
-def sub_callback_done(msg, v):
-    """
-    state가 True가 되면 get_face() 함수가 종료됨
-    """
-    print("get_sub")
-    v.value = True
+    rclpy.init()
+    sub_node = Node("listener_node")
+    arrive_sub(sub_node)
+    rclpy.spin(sub_node)
+    sub_node.destroy_node()
+    rclpy.shutdown()
 
 
 def get_face(self):
@@ -43,11 +49,8 @@ def get_face(self):
     p = subprocess.Popen(["firefox", URL, "--kiosk"])
 
     while True:
-        print(self.state)
-        if self.state:
+        if self.state.value:
             break
-
-    # terminate the subprocess if it's still running
 
     p.terminate()
     return None
@@ -79,16 +82,16 @@ class Sub(Node):
 
 
 def main():
-    v = Value("B", False)
-    p = Process(target=Arrive_sub, v=v)
+    state = Value("B", False)
+    p = Process(target=run, args=(state,))
     p.start()
 
     rclpy.init()
     node = Sub()
-    node.state = v.value
+    node.state = state
 
-    # if args.debug:
-    #     node.listener_callback_get_dest(msg=None)
+    if args.debug:
+        node.listener_callback_get_dest(msg=None)
 
     rclpy.spin(node)
 
