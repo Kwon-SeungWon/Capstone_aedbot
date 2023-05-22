@@ -18,9 +18,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--debug", action="store_true", help="debug mode")
 args = parser.parse_args()
 
+
 def run(state):
     def arrive_sub(sub_node):
-        print('sub start')
         sub = sub_node.create_subscription(
             Bridge,
             "arrive_dest",
@@ -28,12 +28,10 @@ def run(state):
             10,
         )
 
-
     def sub_callback_done(msg):
         """
         state가 True가 되면 get_face() 함수가 종료됨
         """
-        print("get_sub")
         state.value = True
 
     rclpy.init()
@@ -83,12 +81,13 @@ class Sub(Node):
 
 def main():
     state = Value("B", False)
-    p = Process(target=run, args=(state,))
-    p.start()
 
     rclpy.init()
     node = Sub()
     node.state = state
+
+    p = Process(target=run, args=(state,))
+    p.start()
 
     if args.debug:
         node.listener_callback_get_dest(msg=None)
