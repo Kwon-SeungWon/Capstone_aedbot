@@ -31,39 +31,39 @@ def generate_launch_description():
     #     name='cpr_node'
     # ))
 
-    # actions.append(launch_ros.actions.Node(
-    #     package=package_name,
-    #     executable='get_dest',
-    #     output='screen',
-    #     name='get_dest'
-    # ))
+    actions.append(launch_ros.actions.Node(
+        package=package_name,
+        executable='imu_subscriber',
+        output='screen',
+        name='imu_subscriber'
+    ))
 
-    # actions.append(launch_ros.actions.Node(
-    #     package=package_name,
-    #     executable='facetime',
-    #     output='screen',
-    #     name='facetime'
-    # ))
+    actions.append(launch_ros.actions.Node(
+        package=package_name,
+        executable='get_dest',
+        output='screen',
+        name='get_dest'
+    ))
 
-    # actions.append(launch_ros.actions.Node(
-    #     package=package_name,
-    #     executable='bridge_node',
-    #     output='screen',
-    #     name='bridge_node'
-    # ))
+    actions.append(launch_ros.actions.Node(
+        package=package_name,
+        executable='facetime',
+        output='screen',
+        name='facetime'
+    ))
+
+    actions.append(launch_ros.actions.Node(
+        package=package_name,
+        executable='bridge_node',
+        output='screen',
+        name='bridge_node'
+    ))
 
     actions.append(launch_ros.actions.Node(
         package=package_name,
         executable='HRI',
         output='screen',
         name='HRI'
-    ))
-
-    actions.append(launch_ros.actions.Node(
-        package=package_name,
-        executable='imu_subscriber',
-        output='screen',
-        name='imu_subscriber'
     ))
 
     actions.append(launch_ros.actions.Node(

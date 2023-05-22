@@ -97,7 +97,7 @@ controller_server:
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"
       debug_trajectory_details: True
-      min_vel_x: -0.30 #-0.20
+      min_vel_x: -0.02 #-0.20
       min_vel_y: 0.0
       max_vel_x: 0.3
       max_vel_y: 0.0
