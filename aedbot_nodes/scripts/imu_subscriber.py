@@ -102,6 +102,8 @@ class ImuSubscriberNode(Node):
 
 
 def main(args=None):
+    ## micro ros 켜기
+    os.system("ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0")  
     rclpy.init(args=args)
     node = ImuSubscriberNode()
     rclpy.spin(node)
