@@ -2,7 +2,6 @@
 import rclpy
 from rclpy.node import Node
 import requests
-import os
 import time
 import subprocess
 from rclpy.qos import QoSProfile
@@ -48,6 +47,11 @@ def check_quit(seconds: float) -> bool:
 
 
 def connect_facetime():
+    """
+    영상통화를 연결하는 함수
+    영상통화는 끝났는지 확인화는 과정을 ros2 topic이 아닌, 서버로 진행한다.
+    따라서 /HRI와 다르게 멀티프로세싱을 사용하지 않는다.
+    """
     # launch firefox in a subprocess
     p = subprocess.Popen(["firefox", FACETIME_URL, "--kiosk"])
 
