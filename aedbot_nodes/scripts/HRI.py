@@ -1,13 +1,9 @@
 import rclpy
 from rclpy.node import Node
-import requests
-import os
-import time
 import subprocess
 from rclpy.qos import QoSProfile
 import argparse
 from multiprocessing import Process, Value
-from functools import partial
 
 from aedbot_interfaces.msg import FallDetectionToNav2, Bridge
 
@@ -20,7 +16,19 @@ args = parser.parse_args()
 
 
 def run(state):
+    """
+    multi-processing을 위한 함수
+    get_face()에서 while문 안으로 들어가기 때문에, topic sub이 되지 않는다.
+    따라서, multi-processing을 통해 topic sub을 실행시킨다.
+
+    state: multiprocessing.Value (type: bool)
+    위의 공유변수를 통해 프로세스끼리 통신 가능.
+    """
+
     def arrive_sub(sub_node):
+        """
+        ros2 topic subcriber를 생성하는 함수
+        """
         sub = sub_node.create_subscription(
             Bridge,
             "arrive_dest",
@@ -30,10 +38,13 @@ def run(state):
 
     def sub_callback_done(msg):
         """
-        state가 True가 되면 get_face() 함수가 종료됨
+        topic을 받으면, 공유변수를 True로 만듦.
         """
         state.value = True
 
+    """
+    멀티프로세싱에서도 ros2를 사용하기 위해, 동일하게 init()을 해준다.
+    """
     rclpy.init()
     sub_node = Node("listener_node")
     arrive_sub(sub_node)
@@ -84,7 +95,7 @@ def main():
 
     rclpy.init()
     node = Sub()
-    node.state = state
+    node.state = state  # 공유변수를 node에 추가
 
     p = Process(target=run, args=(state,))
     p.start()
