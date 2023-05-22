@@ -10,6 +10,7 @@ from std_msgs.msg import Int32
 
 
 class Bridge_to_Web_CPR(Node):
+
     def __init__(self):
         super().__init__("Bridge_Node")
 
@@ -29,7 +30,12 @@ class Bridge_to_Web_CPR(Node):
         # Topic은 situation_end
         # msg는 Bridge의 complete_cpr, complete_web
         self.subscription = self.create_subscription(
-            Bridge, "situation_end", self.end_callback, 10  # CHANGE
+            Int32, "situation_end", self.cpr_end_callback, 10  # CHANGE
+        )
+        self.subscription
+
+        self.subscription = self.create_subscription(
+            Bridge, "web_end", self.web_end_callback, 10  # CHANGE
         )
         self.subscription
 
@@ -69,15 +75,23 @@ class Bridge_to_Web_CPR(Node):
 
         self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
 
-    def end_callback(self, msg: Bridge):
-        # msg = Bridge()
-        print("end callback")
+    def cpr_end_callback(self, msg:Int32):
+        print("cpr_end callback")
+        # self.bridge_to_cpr = msg.data
 
-        if msg.complete_cpr == 1:
-            self.cpr_state = True
+        # if self.bridge_to_cpr:
+        self.cpr_state = True
+        self.publish_to_station()
+    
+    def web_end_callback(self, msg: Bridge):
+        # msg = Bridge()
+        print("web_end callback")
 
         if msg.complete_web is True:
             self.web_state = True
+            self.publish_to_station()
+
+    def publish_to_station(self):
 
         if self.cpr_state is True and self.web_state is True:
             pub_msg = Bridge()
