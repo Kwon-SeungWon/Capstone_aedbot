@@ -7,7 +7,6 @@ import subprocess
 from rclpy.qos import QoSProfile
 import datetime
 from pytz import timezone  # pip3 install pytz
-import argparse
 
 from aedbot_interfaces.msg import Bridge
 
@@ -17,10 +16,6 @@ KST = timezone("Asia/Seoul")
 
 FACETIME_URL = "https://crov.site:8080/"
 QUIT_URL = "http://130.162.152.119/get_quit/"
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--debug", action="store_true", help="debug mode")
-args = parser.parse_args()
 
 
 def check_quit(seconds: float) -> bool:
@@ -95,9 +90,6 @@ class Sub(Node):
 def main():
     rclpy.init()
     node = Sub()
-
-    if args.debug:
-        node.listener_callback_done(None)
 
     rclpy.spin(node)
 

@@ -2,17 +2,12 @@ import rclpy
 from rclpy.node import Node
 import subprocess
 from rclpy.qos import QoSProfile
-import argparse
 from multiprocessing import Process, Value
 
 from aedbot_interfaces.msg import FallDetectionToNav2, Bridge
 
 
 URL = "http://130.162.152.119/HRI"
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--debug", action="store_true", help="debug mode")
-args = parser.parse_args()
 
 
 def run(state):
@@ -99,9 +94,6 @@ def main():
 
     p = Process(target=run, args=(state,))
     p.start()
-
-    if args.debug:
-        node.listener_callback_get_dest(msg=None)
 
     rclpy.spin(node)
 
