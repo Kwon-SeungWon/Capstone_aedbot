@@ -14,7 +14,7 @@ from aedbot_interfaces.msg import Bridge
 TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
 KST = timezone("Asia/Seoul")
 
-FACETIME_URL = "https://crov.site:8080/"
+FACETIME_URL = "https://crov.site:3000/"
 QUIT_URL = "http://130.162.152.119/get_quit/"
 
 
@@ -47,6 +47,7 @@ def connect_facetime():
     영상통화는 끝났는지 확인화는 과정을 ros2 topic이 아닌, 서버로 진행한다.
     따라서 /HRI와 다르게 멀티프로세싱을 사용하지 않는다.
     """
+    time.sleep(3)
     # launch firefox in a subprocess
     p = subprocess.Popen(["firefox", FACETIME_URL, "--kiosk"])
 
