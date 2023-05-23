@@ -1,18 +1,19 @@
 #! /usr/bin/env python3
 import time  # Time library
- 
-from geometry_msgs.msg import PoseStamped # Pose with ref frame and timestamp
-from rclpy.duration import Duration # Handles time for ROS 2
-import rclpy # Python client library for ROS 2
+
+from geometry_msgs.msg import PoseStamped  # Pose with ref frame and timestamp
+from rclpy.duration import Duration  # Handles time for ROS 2
+import rclpy  # Python client library for ROS 2
 from rclpy.node import Node
 
 from aedbot_interfaces.msg import Bridge, FallDetectionToNav2
 from robot_navigator import BasicNavigator, NavigationResult  # Helper module
 from std_msgs.msg import Int32
- 
-'''
+import requests
+
+"""
 Navigates a robot from an initial pose to a goal pose.
-'''
+"""
 
 
 class Sub_dest_val_Go_to_Destination(Node):
@@ -29,12 +30,10 @@ class Sub_dest_val_Go_to_Destination(Node):
         )
         self.subscription
 
-        self.publisher_ = self.create_publisher(
-            Bridge, "arrive_dest_bridge", 10
-        ) 
+        self.publisher_ = self.create_publisher(Bridge, "arrive_dest_bridge", 10)
         self.should_exit = False
+
     def dest_val_callback(self, destination: FallDetectionToNav2):
-        
         self.get_logger().info(
             "Incoming Destination is \nx: %f\n y: %f\n z: %f\n w: %f\n"
             % (
@@ -52,10 +51,10 @@ class Sub_dest_val_Go_to_Destination(Node):
 
         # Launch the ROS 2 Navigation Stack
         navigator = BasicNavigator()
-      
+
         # Set the robot's initial pose if necessary
         initial_pose = PoseStamped()
-        initial_pose.header.frame_id = 'map'
+        initial_pose.header.frame_id = "map"
         initial_pose.header.stamp = navigator.get_clock().now().to_msg()
         initial_pose.pose.position.x = 0.0
         initial_pose.pose.position.y = 0.0
@@ -65,26 +64,26 @@ class Sub_dest_val_Go_to_Destination(Node):
         initial_pose.pose.orientation.z = 0.0
         initial_pose.pose.orientation.w = 1.0
         navigator.setInitialPose(initial_pose)
-      
+
         # Activate navigation, if not autostarted. This should be called after setInitialPose()
         # or this will initialize at the origin of the map and update the costmap with bogus readings.
         # If autostart, you should `waitUntilNav2Active()` instead.
-        #navigator.lifecycleStartup()
-      
+        # navigator.lifecycleStartup()
+
         # Wait for navigation to fully activate. Use this line if autostart is set to true.
         navigator.waitUntilNav2Active()
-      
+
         # If desired, you can change or load the map as well
         # navigator.changeMap('/path/to/map.yaml')
-      
+
         # You may use the navigator to clear or obtain costmaps
-        #navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
+        # navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
         # global_costmap = navigator.getGlobalCostmap()
         # local_costmap = navigator.getLocalCostmap()
-        
+
         # Set the robot's goal pose
         goal_pose = PoseStamped()
-        goal_pose.header.frame_id = 'map'
+        goal_pose.header.frame_id = "map"
         goal_pose.header.stamp = navigator.get_clock().now().to_msg()
         goal_pose.pose.position.x = destination.dest_x
         goal_pose.pose.position.y = destination.dest_y
@@ -93,68 +92,73 @@ class Sub_dest_val_Go_to_Destination(Node):
         goal_pose.pose.orientation.y = 0.0
         goal_pose.pose.orientation.z = destination.dest_z
         goal_pose.pose.orientation.w = destination.dest_w
-      
+
         # sanity check a valid path exists
         # path = navigator.getPath(initial_pose, goal_pose)
-      
+
         # Go to the goal pose
         navigator.goToPose(goal_pose)
-      
+
         i = 0
-      
+
         # Keep doing stuff as long as the robot is moving towards the goal
         while not navigator.isNavComplete():
-          ################################################
-          #
-          # Implement some code here for your application!
-          #
-          ################################################
-          #navigator.clearCostmapsPeriodically(3)
-          print('clear')
-          # Do something with the feedback
-          i = i + 1
-          feedback = navigator.getFeedback()
-          if feedback and i % 5 == 0:
-            print('Distance remaining: ' + '{:.2f}'.format(
-                  feedback.distance_remaining) + ' meters.')
-      
-            # Some navigation timeout to demo cancellation
-            if Duration.from_msg(feedback.navigation_time) > Duration(seconds=600.0):
-              navigator.cancelNav()
-      
-            # Some navigation request change to demo preemption
-            if Duration.from_msg(feedback.navigation_time) > Duration(seconds=120.0):
-              goal_pose.pose.position.x = -3.0
-              navigator.goToPose(goal_pose)
-      
+            ################################################
+            #
+            # Implement some code here for your application!
+            #
+            ################################################
+            # navigator.clearCostmapsPeriodically(3)
+            print("clear")
+            # Do something with the feedback
+            i = i + 1
+            feedback = navigator.getFeedback()
+            if feedback and i % 5 == 0:
+                print(
+                    "Distance remaining: "
+                    + "{:.2f}".format(feedback.distance_remaining)
+                    + " meters."
+                )
+
+                # Some navigation timeout to demo cancellation
+                if Duration.from_msg(feedback.navigation_time) > Duration(
+                    seconds=600.0
+                ):
+                    navigator.cancelNav()
+
+                # Some navigation request change to demo preemption
+                if Duration.from_msg(feedback.navigation_time) > Duration(
+                    seconds=120.0
+                ):
+                    goal_pose.pose.position.x = -3.0
+                    navigator.goToPose(goal_pose)
+
         # Do something depending on the return code
         result = navigator.getResult()
 
-        
         if result == NavigationResult.SUCCEEDED:
-            print('Goal succeeded!')
+            print("Goal succeeded!")
 
             msg = Bridge()
             msg.nav2_to_bridge = True
             self.publisher_.publish(msg)
-            
+            requests.get("http://130.162.152.119/arrive")
+
             print(msg)
             navigator.lifecycleShutdown()
             self.should_exit = True
-            
+
         elif result == NavigationResult.CANCELED:
-            print('Goal was canceled!')
+            print("Goal was canceled!")
         elif result == NavigationResult.FAILED:
-            print('Goal failed!')
+            print("Goal failed!")
         else:
-            print('Goal has an invalid return status!')
-      
+            print("Goal has an invalid return status!")
+
         # Shut down the ROS 2 Navigation Stack
-        
-        
-        
+
+
 class Go_to_Station(Node):
-    
     def __init__(self):
         super().__init__("Go_to_Station")
         self.subscription = self.create_subscription(
@@ -162,47 +166,51 @@ class Go_to_Station(Node):
         )
         self.subscription
 
-    def end_callback(self, msg:Bridge):
-        #msg = Bridge()
-        print('end_callback')
+    def end_callback(self, msg: Bridge):
+        # msg = Bridge()
+        print("end_callback")
 
         if msg.bridge_to_nav2 == True:
-            print('Lets go')
+            print("Lets go")
             # Launch the ROS 2 Navigation Stack
             navigator = BasicNavigator()
-          
+
             # Set the robot's initial pose if necessary
             initial_pose = PoseStamped()
-            initial_pose.header.frame_id = 'map'
+            initial_pose.header.frame_id = "map"
             initial_pose.header.stamp = navigator.get_clock().now().to_msg()
             initial_pose.pose.position.x = Sub_dest_val_Go_to_Destination.destination_x
             initial_pose.pose.position.y = Sub_dest_val_Go_to_Destination.destination_y
             initial_pose.pose.position.z = 0.0
             initial_pose.pose.orientation.x = 0.0
             initial_pose.pose.orientation.y = 0.0
-            initial_pose.pose.orientation.z = Sub_dest_val_Go_to_Destination.destination_z
-            initial_pose.pose.orientation.w = Sub_dest_val_Go_to_Destination.destination_w
+            initial_pose.pose.orientation.z = (
+                Sub_dest_val_Go_to_Destination.destination_z
+            )
+            initial_pose.pose.orientation.w = (
+                Sub_dest_val_Go_to_Destination.destination_w
+            )
             navigator.setInitialPose(initial_pose)
-          
+
             # Activate navigation, if not autostarted. This should be called after setInitialPose()
             # or this will initialize at the origin of the map and update the costmap with bogus readings.
             # If autostart, you should `waitUntilNav2Active()` instead.
             navigator.lifecycleStartup()
-          
+
             # Wait for navigation to fully activate. Use this line if autostart is set to true.
-            #navigator.waitUntilNav2Active()
-          
+            # navigator.waitUntilNav2Active()
+
             # If desired, you can change or load the map as well
             # navigator.changeMap('/path/to/map.yaml')
-          
+
             # You may use the navigator to clear or obtain costmaps
-            #navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
+            # navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
             # global_costmap = navigator.getGlobalCostmap()
             # local_costmap = navigator.getLocalCostmap()
             navigator.clearCostmapsPeriodically(3)
             # Set the robot's goal pose
             goal_pose = PoseStamped()
-            goal_pose.header.frame_id = 'map'
+            goal_pose.header.frame_id = "map"
             goal_pose.header.stamp = navigator.get_clock().now().to_msg()
             goal_pose.pose.position.x = 0.0
             goal_pose.pose.position.y = 0.0
@@ -211,67 +219,74 @@ class Go_to_Station(Node):
             goal_pose.pose.orientation.y = 0.0
             goal_pose.pose.orientation.z = 0.0
             goal_pose.pose.orientation.w = 1.0
-          
+
             # sanity check a valid path exists
             # path = navigator.getPath(initial_pose, goal_pose)
-          
+
             # Go to the goal pose
             navigator.goToPose(goal_pose)
-          
+
             i = 0
-          
+
             # Keep doing stuff as long as the robot is moving towards the goal
             while not navigator.isNavComplete():
-              ################################################
-              #
-              # Implement some code here for your application!
-              #
-              ################################################
-              #navigator.clear_periodically_costmap()
-              print('clear')
-              # Do something with the feedback
-              i = i + 1
-              feedback = navigator.getFeedback()
-              if feedback and i % 5 == 0:
-                print('Distance remaining: ' + '{:.2f}'.format(
-                      feedback.distance_remaining) + ' meters.')
-          
-                # Some navigation timeout to demo cancellation
-                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=600.0):
-                  navigator.cancelNav()
-          
-                # Some navigation request change to demo preemption
-                if Duration.from_msg(feedback.navigation_time) > Duration(seconds=120.0):
-                  goal_pose.pose.position.x = -3.0
-                  navigator.goToPose(goal_pose)
-          
+                ################################################
+                #
+                # Implement some code here for your application!
+                #
+                ################################################
+                # navigator.clear_periodically_costmap()
+                print("clear")
+                # Do something with the feedback
+                i = i + 1
+                feedback = navigator.getFeedback()
+                if feedback and i % 5 == 0:
+                    print(
+                        "Distance remaining: "
+                        + "{:.2f}".format(feedback.distance_remaining)
+                        + " meters."
+                    )
+
+                    # Some navigation timeout to demo cancellation
+                    if Duration.from_msg(feedback.navigation_time) > Duration(
+                        seconds=600.0
+                    ):
+                        navigator.cancelNav()
+
+                    # Some navigation request change to demo preemption
+                    if Duration.from_msg(feedback.navigation_time) > Duration(
+                        seconds=120.0
+                    ):
+                        goal_pose.pose.position.x = -3.0
+                        navigator.goToPose(goal_pose)
+
             # Do something depending on the return code
             result = navigator.getResult()
             if result == NavigationResult.SUCCEEDED:
-                print('Goal succeeded!')
-                print('ENDENDENDENDENDENDENDEND')
+                print("Goal succeeded!")
+                print("ENDENDENDENDENDENDENDEND")
             elif result == NavigationResult.CANCELED:
-                print('Goal was canceled!')
+                print("Goal was canceled!")
             elif result == NavigationResult.FAILED:
-                print('Goal failed!')
+                print("Goal failed!")
             else:
-                print('Goal has an invalid return status!')
-          
+                print("Goal has an invalid return status!")
+
             # Shut down the ROS 2 Navigation Stack
             navigator.lifecycleShutdown()
-          
 
 
 def main1(args=None):
     # Start the ROS 2 Python Client Library
     rclpy.init(args=args)
     sub_dest_val_go_to_destination = Sub_dest_val_Go_to_Destination()
-    
+
     while rclpy.ok() and not sub_dest_val_go_to_destination.should_exit:
         rclpy.spin_once(sub_dest_val_go_to_destination)
-        
+
     sub_dest_val_go_to_destination.destroy_node()
     rclpy.shutdown()
+
 
 def main2(args=None):
     # Start the ROS 2 Python Client Library
@@ -280,10 +295,9 @@ def main2(args=None):
     rclpy.spin(go_to_station)
     go_to_station.destroy_node()
     rclpy.shutdown()
-    #rclpy.init(args=args)
-    
+    # rclpy.init(args=args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main1()
     main2()
