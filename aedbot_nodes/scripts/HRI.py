@@ -6,53 +6,46 @@ import time
 import subprocess
 from rclpy.qos import QoSProfile
 import argparse
-from multiprocessing import Process, Value
 from functools import partial
+import datetime
+from pytz import timezone
 
 from aedbot_interfaces.msg import FallDetectionToNav2, Bridge
 
 
-URL = "http://130.162.152.119/HRI"
+URL = "http://130.162.152.119"
+TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
+KST = timezone("Asia/Seoul")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--debug", action="store_true", help="debug mode")
 args = parser.parse_args()
 
 
-def run(state):
-    def arrive_sub(sub_node):
-        print("sub start")
-        sub = sub_node.create_subscription(
-            Bridge,
-            "arrive_dest",
-            sub_callback_done,
-            10,
-        )
+def get_time_diff(URL):
+    r = requests.get(url=URL)
+    data = r.json()
+    server_time = data["time"]
 
-    def sub_callback_done(msg):
-        """
-        state가 True가 되면 get_face() 함수가 종료됨
-        """
-        print("get_sub")
-        state.value = True
+    current_time = datetime.datetime.now(KST).strftime(TIME_FORMAT)
+    time_diff = datetime.datetime.strptime(
+        current_time, TIME_FORMAT
+    ) - datetime.datetime.strptime(server_time, TIME_FORMAT)
 
-    rclpy.init()
-    sub_node = Node("listener_node")
-    arrive_sub(sub_node)
-    rclpy.spin(sub_node)
-    sub_node.destroy_node()
-    rclpy.shutdown()
+    if abs(time_diff.total_seconds()) < 5:
+        return True
+
+    return False
 
 
-def get_face(self):
+def get_face():
     # launch firefox in a subprocess
-    p = subprocess.Popen(["firefox", URL, "--kiosk"])
+    p = subprocess.Popen(["firefox", URL + "/HRI", "--kiosk"])
 
     while True:
-        if self.state.value:
+        if get_time_diff(URL + "/get_arrive"):
             break
 
-    requests.get("http://130.162.152.119/arrive")
     p.terminate()
     return None
 
@@ -79,17 +72,12 @@ class Sub(Node):
             return None
 
         self.callback_count = True
-        get_face(self)
+        get_face()
 
 
 def main():
-    state = Value("B", False)
-    p = Process(target=run, args=(state,))
-    p.start()
-
     rclpy.init()
     node = Sub()
-    node.state = state
 
     if args.debug:
         node.listener_callback_get_dest(msg=None)
