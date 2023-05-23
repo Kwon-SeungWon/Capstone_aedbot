@@ -10,7 +10,6 @@ from std_msgs.msg import Int32
 
 
 class Bridge_to_Web_CPR(Node):
-
     def __init__(self):
         super().__init__("Bridge_Node")
 
@@ -39,27 +38,23 @@ class Bridge_to_Web_CPR(Node):
         )
         self.subscription
 
+        self.cpr_state: bool = False
+        self.web_state: bool = False
+
         # CPR, WEB 통신이 끝났을 때 bridge에서 nav2로 복귀신호
         # Topic은 arrive_dest_bridge
         # msg는 Bridge의 bridge_to_nav2
         self.publisher_to_nav2 = self.create_publisher(Bridge, "arrive_dest_bridge", 10)
 
     # int32 bridge_to_cpr
-    def arrive_callback(self, msg:Bridge):
-
-        #msg = Bridge()
+    def arrive_callback(self, msg: Bridge):
+        # msg = Bridge()
         self.nav2_to_bridge = msg.nav2_to_bridge
 
         if msg.bridge_to_cpr:
-            self.nav2_to_bridge ==False
-            
-        #if self.nav2_to_bridge == True:
-            
-        self.cpr_state: bool = False
-        self.web_state: bool = False
+            self.nav2_to_bridge == False
 
-    def arrive_callback(self, msg: Bridge):
-        # msg = Bridge()
+        # if self.nav2_to_bridge == True:
 
         if msg.nav2_to_bridge == True:
             print("arrive callback")
@@ -75,14 +70,14 @@ class Bridge_to_Web_CPR(Node):
 
         self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
 
-    def cpr_end_callback(self, msg:Int32):
+    def cpr_end_callback(self, msg: Int32):
         print("cpr_end callback")
         # self.bridge_to_cpr = msg.data
 
         # if self.bridge_to_cpr:
         self.cpr_state = True
         self.publish_to_station()
-    
+
     def web_end_callback(self, msg: Bridge):
         # msg = Bridge()
         print("web_end callback")
@@ -92,7 +87,6 @@ class Bridge_to_Web_CPR(Node):
             self.publish_to_station()
 
     def publish_to_station(self):
-
         if self.cpr_state is True and self.web_state is True:
             pub_msg = Bridge()
             pub_msg.bridge_to_nav2 = True
