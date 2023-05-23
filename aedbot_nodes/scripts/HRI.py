@@ -18,16 +18,16 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--debug", action="store_true", help="debug mode")
 args = parser.parse_args()
 
+
 def run(state):
     def arrive_sub(sub_node):
-        print('sub start')
+        print("sub start")
         sub = sub_node.create_subscription(
             Bridge,
             "arrive_dest",
             sub_callback_done,
             10,
         )
-
 
     def sub_callback_done(msg):
         """
@@ -52,6 +52,7 @@ def get_face(self):
         if self.state.value:
             break
 
+    requests.get("http://130.162.152.119/arrive")
     p.terminate()
     return None
 
