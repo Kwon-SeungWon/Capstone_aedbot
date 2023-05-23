@@ -91,7 +91,8 @@ class ImuSubscriberNode(Node):
             self.mean_count = self.count_sum /self.period
 
             if 1.8<= self.mean_count <= 2.4:
-                print("sound:good")
+                print("sound:good") #playsound("/root/catkin_ws/src/aedbot/aedbot_nodes/music/good.mp3", True)
+
             if self.mean_count<1.6:
                 print("sound:week")
             if 2.4<self.mean_count:
