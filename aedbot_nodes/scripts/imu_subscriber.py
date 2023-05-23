@@ -51,7 +51,7 @@ class ImuSubscriberNode(Node):
         #os.system("sudo pulseaudio -k")
         #os.system("pactl -- set-sink-volume 0 50%")  # 200%
         #os.system("pulseaudio --start")        
-        playsound("/root/catkin_ws/src/aedbot/aedbot_nodes/music/120bpm.mp3", True)
+        #playsound("/root/catkin_ws/src/aedbot/aedbot_nodes/music/120bpm.mp3", True)
 
         count_msg = Int32()
         #self.get_logger().info("count:%d" % count_msg.data)
