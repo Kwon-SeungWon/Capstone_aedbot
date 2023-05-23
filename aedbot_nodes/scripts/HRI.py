@@ -46,6 +46,8 @@ def get_face():
         if get_time_diff(URL + "/get_arrive"):
             break
 
+        time.sleep(0.01)
+
     p.terminate()
     return None
 
