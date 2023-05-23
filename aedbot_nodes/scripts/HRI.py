@@ -1,25 +1,18 @@
 import rclpy
 from rclpy.node import Node
 import requests
-import os
 import time
 import subprocess
 from rclpy.qos import QoSProfile
-import argparse
-from functools import partial
 import datetime
 from pytz import timezone
 
-from aedbot_interfaces.msg import FallDetectionToNav2, Bridge
+from aedbot_interfaces.msg import FallDetectionToNav2
 
 
 URL = "http://130.162.152.119"
 TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
 KST = timezone("Asia/Seoul")
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--debug", action="store_true", help="debug mode")
-args = parser.parse_args()
 
 
 def get_time_diff(URL):
@@ -80,9 +73,6 @@ class Sub(Node):
 def main():
     rclpy.init()
     node = Sub()
-
-    if args.debug:
-        node.listener_callback_get_dest(msg=None)
 
     rclpy.spin(node)
 
