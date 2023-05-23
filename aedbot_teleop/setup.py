@@ -3,42 +3,43 @@ from glob import glob
 from setuptools import find_packages
 from setuptools import setup
 
-package_name = 'aedbot_teleop'
+package_name = "aedbot_teleop"
 
 setup(
     name=package_name,
-    version='2.1.2',
+    version="2.1.2",
     packages=find_packages(exclude=[]),
     data_files=[
-        ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name, 'param'), glob('param/*.yaml')),
+        ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
+        ("share/" + package_name, ["package.xml"]),
+        (os.path.join("share", package_name, "launch"), glob("launch/*.launch.py")),
+        (os.path.join("share", package_name, "param"), glob("param/*.yaml")),
     ],
     install_requires=[
-        'setuptools',
+        "setuptools",
     ],
     zip_safe=True,
-    author='Bishop Pearson',
-    author_email='bishopearson@gmail.com',
-    maintainer='Bishop Pearson',
-    maintainer_email='bishopearson@gmail.com',
-    keywords=['ROS'],
+    author="Bishop Pearson",
+    author_email="bishopearson@gmail.com",
+    maintainer="Bishop Pearson",
+    maintainer_email="bishopearson@gmail.com",
+    keywords=["ROS"],
     classifiers=[
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Programming Language :: Python',
-        'Topic :: Software Development',
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python",
+        "Topic :: Software Development",
     ],
     description=(
-        'Teleoperation node using keyboard or joystick for the OMORobot R1 Mini'
+        "Teleoperation node using keyboard or joystick for the OMORobot R1 Mini"
     ),
-    license='Apache License, Version 2.0',
-    tests_require=['pytest'],
+    license="Apache License, Version 2.0",
+    tests_require=["pytest"],
     entry_points={
-        'console_scripts': [
-            'teleop_keyboard = aedbot_teleop.script.teleop_keyboard:main',
-            'teleop_joy = aedbot_teleop.script.teleop_joy:main' 
+        "console_scripts": [
+            "teleop_keyboard = aedbot_teleop.script.teleop_keyboard:main",
+            "teleop_joy = aedbot_teleop.script.teleop_joy:main",
+            "super_teleop = aedbot_teleop.script.super_teleop:main",
         ],
     },
 )
