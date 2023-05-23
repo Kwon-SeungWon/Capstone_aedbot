@@ -50,13 +50,14 @@ class Bridge_to_Web_CPR(Node):
     def arrive_callback(self, msg: Bridge):
         # msg = Bridge()
         self.nav2_to_bridge = msg.nav2_to_bridge
+        self.bridge_to_cpr = self.cpr_state
 
-        if msg.bridge_to_cpr:
-            self.nav2_to_bridge == False
+        if self.bridge_to_cpr:
+            self.nav2_to_bridge = False
 
         # if self.nav2_to_bridge == True:
 
-        if msg.nav2_to_bridge == True:
+        if self.nav2_to_bridge == True:
             print("arrive callback")
             # msg.nav2_to_bridge = True
             msg.arrive_destination = True
@@ -73,9 +74,16 @@ class Bridge_to_Web_CPR(Node):
     def cpr_end_callback(self, msg: Int32):
         print("cpr_end callback")
         # self.bridge_to_cpr = msg.data
+        arrive_msg = Bridge()
+        arrive_msg.arrive_destination = False
+        arrive_msg.bridge_to_cpr = True
+        arrive_msg.bridge_to_nav2 = True
+        arrive_msg.complete_web = False
+        arrive_msg.nav2_to_bridge = False
 
-        # if self.bridge_to_cpr:
-        self.cpr_state = True
+        self.publisher_to_CPR.publish(arrive_msg)
+
+            
         self.publish_to_station()
 
     def web_end_callback(self, msg: Bridge):

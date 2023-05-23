@@ -43,6 +43,10 @@ class ImuSubscriberNode(Node):
 
             self.imu_subscriber_ = self.create_subscription(
                 Imu, "cpr_imu/data", self.imu_callback, 10)
+        
+        else:
+            rclpy.shutdown()
+
 
     def imu_callback(self, msg: Imu):
         # self.k= Bool.data
