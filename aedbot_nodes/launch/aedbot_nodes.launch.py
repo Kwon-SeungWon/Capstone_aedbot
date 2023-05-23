@@ -59,12 +59,12 @@ def generate_launch_description():
         name='bridge_node'
     ))
 
-    # actions.append(launch_ros.actions.Node(
-    #     package=package_name,
-    #     executable='HRI',
-    #     output='screen',
-    #     name='HRI'
-    # ))
+    actions.append(launch_ros.actions.Node(
+        package=package_name,
+        executable='HRI',
+        output='screen',
+        name='HRI'
+    ))
 
     actions.append(launch_ros.actions.Node(
         package=package_name,
