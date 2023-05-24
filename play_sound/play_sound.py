@@ -5,12 +5,14 @@ from pytz import timezone
 import requests
 import multiprocessing
 import time
+import subprocess
 
 
 TIME_FORMAT = "%Y-%m-%d_%H:%M:%S"
 KST = timezone("Asia/Seoul")
 
 URL = "http://130.162.152.119"
+FACETIME_URL = "https://crov.site:3000/"
 
 CURRENT_PATH = os.path.dirname(os.path.abspath(__file__))
 SOUND_PATH = os.path.join(CURRENT_PATH, "sound")
@@ -42,34 +44,40 @@ def main():
         time.sleep(0.01)
 
     # # os.system("pactl -- set-sink-volume 0 100%")
-    proc_bpm = multiprocessing.Process(
-        target=playsound.playsound, args=(SIREN_PATH, True)
-    )
-    proc_bpm.start()
-
-    while True:
-        if get_time_diff(URL + "/get_arrive"):
-            proc_bpm.terminate()
-            break
-
-        if len(multiprocessing.active_children()) == 0:
-            proc_bpm.start()
-
-        time.sleep(0.01)
-
-    # os.system("pactl -- set-sink-volume 0 100%")
     proc_siren = multiprocessing.Process(
-        target=playsound.playsound, args=(BPM_PATH, True)
+        target=playsound.playsound, args=(SIREN_PATH, True)
     )
     proc_siren.start()
 
     while True:
-        if get_time_diff(URL + "/get_quit"):
+        if get_time_diff(URL + "/get_arrive"):
             proc_siren.terminate()
             break
 
         if len(multiprocessing.active_children()) == 0:
             proc_siren.start()
+
+        time.sleep(0.01)
+
+    # os.system("pactl -- set-sink-volume 0 100%")
+    proc_bpm = multiprocessing.Process(
+        target=playsound.playsound, args=(BPM_PATH, True)
+    )
+    proc_bpm.start()
+
+    time.sleep(3)
+    # launch firefox in a subprocess
+    proc_facetime = subprocess.Popen(["firefox", FACETIME_URL, "--kiosk"])
+
+    while True:
+        if get_time_diff(URL + "/get_quit"):
+            proc_bpm.terminate()
+            proc_facetime.terminate()
+
+            break
+
+        if len(multiprocessing.active_children()) == 0:
+            proc_bpm.start()
 
         time.sleep(0.01)
 
