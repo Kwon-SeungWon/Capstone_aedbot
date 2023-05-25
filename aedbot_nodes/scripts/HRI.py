@@ -47,26 +47,6 @@ def get_face():
 
 class Sub(Node):
     def __init__(self):
-        super().__init__("sub")
-        qos_profile = QoSProfile(depth=10)
-
-        self.subscription_start = self.create_subscription(
-            FallDetectionToNav2,
-            "dest_val",
-            self.listener_callback_get_dest,
-            qos_profile,
-        )
-
-        self.callback_count = False  # callback이 두번 호출되는 것을 방지하기 위함
-
-    def listener_callback_get_dest(self, msg):
-        if self.callback_count:
-            """
-            callback이 두번 호출되는 것을 방지하기 위함
-            """
-            return None
-
-        self.callback_count = True
         get_face()
 
 
