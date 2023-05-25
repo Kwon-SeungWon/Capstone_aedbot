@@ -45,12 +45,12 @@ def generate_launch_description():
         name='get_dest'
     ))
 
-    actions.append(launch_ros.actions.Node(
-        package=package_name,
-        executable='facetime',
-        output='screen',
-        name='facetime'
-    ))
+    # actions.append(launch_ros.actions.Node(
+    #     package=package_name,
+    #     executable='facetime',
+    #     output='screen',
+    #     name='facetime'
+    # ))
 
     actions.append(launch_ros.actions.Node(
         package=package_name,
