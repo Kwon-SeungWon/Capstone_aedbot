@@ -5,6 +5,7 @@ from rclpy.node import Node
 import requests
 import json
 import datetime
+from std_msgs.msg import Float64
 from pytz import timezone  # pip3 install pytz
 
 from aedbot_interfaces.msg import FallDetectionToNav2
@@ -34,6 +35,10 @@ class MinimalPublisher(Node):
         self.publisher_ = self.create_publisher(
             FallDetectionToNav2, "dest_val", 10
         )  # CHANGE
+
+        self.publisher_arduino = self.create_publisher(
+            Float64, "dest_val_arduino", 10
+        )  # CHANGE
         timer_period = 0.5
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.state = False
@@ -43,6 +48,7 @@ class MinimalPublisher(Node):
             return None
 
         destination = FallDetectionToNav2()
+        msg = Float64()
         x, y, z, w, time = get_dest()
 
         current_time = datetime.datetime.now(KST).strftime(TIME_FORMAT)
@@ -59,8 +65,9 @@ class MinimalPublisher(Node):
             destination.dest_z = z
             destination.dest_w = w
 
-            for _ in range(5):
+            for _ in range(1):
                 self.publisher_.publish(destination)
+                self.publisher_arduino.publish(msg)
                 self.get_logger().info(
                     f"I pub: {destination.dest_x}, {destination.dest_y}, {destination.dest_z}, {destination.dest_w}"
                 )
