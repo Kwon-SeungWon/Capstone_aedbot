@@ -16,6 +16,7 @@ from nav2_msgs.action import (
     # ComputePathThroughPoses,
 )
 from nav2_msgs.srv import LoadMap, ClearEntireCostmap, ManageLifecycleNodes, GetCostmap
+from std_srvs.srv import Empty
 
 import rclpy
 
@@ -85,6 +86,10 @@ class BasicNavigator(Node):
         self.get_costmap_local_srv = self.create_client(
             GetCostmap, "/local_costmap/get_costmap"
         )
+
+        self.timer = self.create_timer(         # 3초마다 클리어 요청 보내기
+            3.0, self.clear_costmap_callback
+        )  
 
     def setInitialPose(self, initial_pose):
         self.initial_pose_received = False
@@ -295,31 +300,26 @@ class BasicNavigator(Node):
             self.info("Change map request was successful!")
         return
 
-    def clearCostmapsPeriodically(self, interval_sec):
-        asyncio.ensure_future(self.clearCostmapsLoop(interval_sec))
+    def clear_costmap_callback(self):
+        self.clearLocalCostmap()
+        self.clearGlobalCostmap()
+        return
 
-    async def clearCostmapsLoop(self, interval_sec):
-        while True:
-            await self.clearAllCostmaps()
-            await asyncio.sleep(interval_sec)
-
-    async def clearAllCostmaps(self):
-        await self.clearLocalCostmap()
-        await self.clearGlobalCostmap()
-
-    async def clearLocalCostmap(self):
-        if await self.clear_costmap_local_srv.wait_for_service(timeout_sec=1.0):
-            req = ClearEntireCostmap.Request()
-            await self.clear_costmap_local_srv.call_async(req)
-        else:
+    def clearLocalCostmap(self):
+        while not self.clear_costmap_local_srv.wait_for_service(timeout_sec=1.0):
             self.info("Clear local costmaps service not available, waiting...")
+        req = ClearEntireCostmap.Request()
+        future = self.clear_costmap_local_srv.call_async(req)
+        rclpy.spin_until_future_complete(self, future)
+        return
 
-    async def clearGlobalCostmap(self):
-        if await self.clear_costmap_global_srv.wait_for_service(timeout_sec=1.0):
-            req = ClearEntireCostmap.Request()
-            await self.clear_costmap_global_srv.call_async(req)
-        else:
+    def clearGlobalCostmap(self):
+        while not self.clear_costmap_global_srv.wait_for_service(timeout_sec=1.0):
             self.info("Clear global costmaps service not available, waiting...")
+        req = ClearEntireCostmap.Request()
+        future = self.clear_costmap_global_srv.call_async(req)
+        rclpy.spin_until_future_complete(self, future)
+        return
 
     def getGlobalCostmap(self):
         while not self.get_costmap_global_srv.wait_for_service(timeout_sec=1.0):
