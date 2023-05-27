@@ -29,46 +29,7 @@ FINISH_CPR_PATH = os.path.join(SOUND_PATH, "when_cpr_finish_tts.mp3")
 # when_cpr_finish_tts.mp3 => 모든 상황이 종료되었습니다. 물품들을 원위치해주시고 복귀 버튼을 눌러주세요
 
 
-def get_time_diff(URL):
-    r = requests.get(url=URL)
-    data = r.json()
-    server_time = data["time"]
-
-    current_time = datetime.datetime.now(KST).strftime(TIME_FORMAT)
-    time_diff = datetime.datetime.strptime(
-        current_time, TIME_FORMAT
-    ) - datetime.datetime.strptime(server_time, TIME_FORMAT)
-
-    if abs(time_diff.total_seconds()) < 5:
-        return True
-
-    return False
-
-
 def main():
-    while True:
-        if get_time_diff(URL + "/get_dest"):
-            break
-        time.sleep(0.01)
-
-    # # os.system("pactl -- set-sink-volume 0 100%")
-    proc_siren = multiprocessing.Process(
-        target=playsound.playsound, args=(SIREN_PATH, True)
-    )
-    proc_siren.start()
-
-    while True:
-        if get_time_diff(URL + "/get_arrive"):
-            proc_siren.terminate()
-            break
-
-        if len(multiprocessing.active_children()) == 0:
-            proc_siren.start()
-
-        time.sleep(0.01)
-
-    # os.system("pactl -- set-sink-volume 0 100%")
-
     proc_arrive = multiprocessing.Process(
         target=playsound.playsound, args=(ARRIVE_PATH, True)
     )
@@ -87,27 +48,24 @@ def main():
     proc_bpm.start()
 
     time.sleep(3)
-    # launch firefox in a subprocess
-    proc_facetime = subprocess.Popen(["firefox", FACETIME_URL, "--kiosk"])
 
     proc_cpr_finish = multiprocessing.Process(
         target=playsound.playsound, args=(FINISH_CPR_PATH, True)
     )
 
-    while True:
-        if get_time_diff(URL + "/get_quit"):
-            proc_bpm.terminate()
-            proc_facetime.terminate()
-            proc_cpr_finish.start()
-            proc_cpr_finish.join()
-            break
+    # while True:
+    #     if get_time_diff(URL + "/get_quit"):
+    #
+    #         proc_cpr_finish.start()
+    #         proc_cpr_finish.join()
+    #         break
 
-        if len(multiprocessing.active_children()) == 0:
-            proc_bpm.start()
+    #     if len(multiprocessing.active_children()) == 0:
+    #         proc_bpm.start()
 
-        time.sleep(0.01)
+    #     time.sleep(0.01)
 
-    return None
+    # return None
 
 
 if __name__ == "__main__":
