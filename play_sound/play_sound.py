@@ -107,6 +107,8 @@ def main():
 
         time.sleep(0.01)
 
+    proc_HRI_return = subprocess.Popen(["firefox", URL + "/HRI_RETURN", "--kiosk"])
+
     return None
 
 
