@@ -96,6 +96,9 @@ class Sub_dest_val_Go_to_Destination(Node):
         # sanity check a valid path exists
         # path = navigator.getPath(initial_pose, goal_pose)
 
+        # 주기적으로 코스트맵 클리어
+        navigator.clear_costmap_callback()
+        
         # Go to the goal pose
         navigator.goToPose(goal_pose)
 
