@@ -259,7 +259,7 @@ map_server:
     use_sim_time: False
 
     ##################추후 변경######################
-    yaml_filename: "map_112_0516.yaml" 
+    yaml_filename: "map_0528.yaml" 
 
 map_saver:
   ros__parameters:

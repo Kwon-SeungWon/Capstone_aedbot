@@ -28,62 +28,69 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.substitutions import ThisLaunchFileDir
 
+
 def generate_launch_description():
-    use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    use_sim_time = LaunchConfiguration("use_sim_time", default="false")
     map_dir = LaunchConfiguration(
-        'map',
+        "map",
         default=os.path.join(
-            get_package_share_directory('aedbot_navigation2'),
-            'map',
-            'map_112_0516.yaml'))       # map_112 파일 이름 변경하면 됨
+            get_package_share_directory("aedbot_navigation2"), "map", "map_0528.yaml"
+        ),
+    )  # map_112 파일 이름 변경하면 됨
 
-    param_file_name = 'aedbot.yaml'
+    param_file_name = "aedbot.yaml"
     param_dir = LaunchConfiguration(
-        'params_file',
+        "params_file",
         default=os.path.join(
-            get_package_share_directory('aedbot_navigation2'),
-            'param',
-            param_file_name))
+            get_package_share_directory("aedbot_navigation2"), "param", param_file_name
+        ),
+    )
 
-    nav2_launch_file_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
+    nav2_launch_file_dir = os.path.join(
+        get_package_share_directory("nav2_bringup"), "launch"
+    )
 
-    package_name='aedbot_navigation2'
+    package_name = "aedbot_navigation2"
 
-    return LaunchDescription([
-        DeclareLaunchArgument(
-            'map',
-            default_value=map_dir,
-            description='Full path to map file to load'),
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument(
+                "map",
+                default_value=map_dir,
+                description="Full path to map file to load",
+            ),
+            DeclareLaunchArgument(
+                "params_file",
+                default_value=param_dir,
+                description="Full path to param file to load",
+            ),
+            DeclareLaunchArgument(
+                "use_sim_time",
+                default_value="false",
+                description="Use simulation (Gazebo) clock if true",
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    [nav2_launch_file_dir, "/bringup_launch.py"]
+                ),
+                launch_arguments={
+                    "map": map_dir,
+                    "use_sim_time": use_sim_time,
+                    "params_file": param_dir,
+                }.items(),
+            )
+            # Node(
+            #     package=package_name,
+            #     executable='go_to_goal.py',
+            #     output='screen',
+            #     name='go_to_goal'
+            # )
+            # IncludeLaunchDescription(
+            #     PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/navigation2_rviz.launch.py'])
+            # )
+        ]
+    )
 
-        DeclareLaunchArgument(
-            'params_file',
-            default_value=param_dir,
-            description='Full path to param file to load'),
 
-        DeclareLaunchArgument(
-            'use_sim_time',
-            default_value='false',
-            description='Use simulation (Gazebo) clock if true'),
-
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([nav2_launch_file_dir, '/bringup_launch.py']),
-            launch_arguments={
-                'map': map_dir,
-                'use_sim_time': use_sim_time,
-                'params_file': param_dir}.items(),
-        )
-
-        # Node(
-        #     package=package_name,
-        #     executable='go_to_goal.py',
-        #     output='screen',
-        #     name='go_to_goal'
-        # )
-
-        # IncludeLaunchDescription(
-        #     PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/navigation2_rviz.launch.py'])
-        # )
-    ]) 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     generate_launch_description()

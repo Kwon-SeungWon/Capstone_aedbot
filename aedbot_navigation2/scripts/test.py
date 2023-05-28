@@ -9,12 +9,15 @@ from rclpy.node import Node
 from aedbot_interfaces.msg import Bridge, FallDetectionToNav2
 from robot_navigator import BasicNavigator, NavigationResult  # Helper module
 from std_msgs.msg import Int32
+
 """
 Follow waypoints using the ROS 2 Navigation Stack (Nav2)
 """
 
 global count
 count = 0
+
+
 class Go_to_Destination:
     def set_initial_pose(self):
         # Launch the ROS 2 Navigation Stack
@@ -35,13 +38,12 @@ class Go_to_Destination:
         navigator.setInitialPose(initial_pose)
 
         # Wait for navigation to fully activate. Use this line if autostart is set to true.
-        #navigator.lifecycleStartup()
+        # navigator.lifecycleStartup()
         navigator.waitUntilNav2Active()
 
-        navigator.clearAllCostmaps()  
+        navigator.clearAllCostmaps()
 
     def go_to_destination(self):
-
         navigator = BasicNavigator()
 
         # 주기적으로 local, global costmap clear (5s 마다)
@@ -64,7 +66,7 @@ class Go_to_Destination:
         print(goal_poses)
 
         # LET'S GO
-        #nav_start = navigator.get_clock().now()
+        # nav_start = navigator.get_clock().now()
         # navigator.followWaypoints(goal_poses)
         navigator.goToPose(goal_pose)
 
@@ -112,7 +114,7 @@ class Go_to_Destination:
 
         # Do something depending on the return code
         result = navigator.getResult()
-        
+
         if result == NavigationResult.SUCCEEDED:
             count = 1
             print("Goal succeeded!")
@@ -123,9 +125,8 @@ class Go_to_Destination:
         else:
             print("Goal has an invalid return status!")
 
-    
         navigator.lifecycleShutdown()
-        count =1
+        count = 1
         print(count)
 
         exit(0)
@@ -280,11 +281,9 @@ class Bridge_to_Web_CPR(Node):
         ## 목적지에 도착 했을 때
         self.publisher = self.create_publisher(Bridge, "arrive_dest", 10)
 
-        if BasicNavigator.getResult or count== 1:
-
+        if BasicNavigator.getResult or count == 1:
             timer_period = 1
             self.timer = self.create_timer(timer_period, self.arrive_callback)
-        
 
         ## CPR, WEB 통신이 끝났을 때
         self.subscription = self.create_subscription(
@@ -303,18 +302,16 @@ class Bridge_to_Web_CPR(Node):
             self.publisher.publish(msg)
         self.get_logger().info('Publishing: "%d"' % msg.arrive_destination)
 
-
         # if self.i == 5:
         #     exit(0)
 
     def end_callback(self, msg: Bridge):
         come_back = BackToStation()
         global count
-        count +=1
+        count += 1
 
         if msg.complete_cpr and msg.complete_web == True:
             come_back.back_to_station()
-
 
 
 def main(args=None):
@@ -326,7 +323,7 @@ def main(args=None):
     go_to_destination.set_initial_pose()
 
     # bridge 노드 실행
-    
+
     bridge = Bridge_to_Web_CPR()
 
     # Service 노드 실행
