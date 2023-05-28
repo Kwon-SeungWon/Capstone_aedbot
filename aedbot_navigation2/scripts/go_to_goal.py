@@ -98,7 +98,7 @@ class Sub_dest_val_Go_to_Destination(Node):
 
         # 주기적으로 코스트맵 클리어
         navigator.clear_costmap_callback()
-        
+
         # Go to the goal pose
         navigator.goToPose(goal_pose)
 
@@ -210,7 +210,7 @@ class Go_to_Station(Node):
             # navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
             # global_costmap = navigator.getGlobalCostmap()
             # local_costmap = navigator.getLocalCostmap()
-            navigator.clearCostmapsPeriodically(3)
+            navigator.clear_costmap_callback()
             # Set the robot's goal pose
             goal_pose = PoseStamped()
             goal_pose.header.frame_id = "map"
