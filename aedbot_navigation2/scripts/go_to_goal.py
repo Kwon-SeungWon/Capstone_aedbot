@@ -61,8 +61,8 @@ class Sub_dest_val_Go_to_Destination(Node):
         initial_pose.pose.position.z = 0.0
         initial_pose.pose.orientation.x = 0.0
         initial_pose.pose.orientation.y = 0.0
-        initial_pose.pose.orientation.z = 0.0
-        initial_pose.pose.orientation.w = 1.0
+        initial_pose.pose.orientation.z = -0.707
+        initial_pose.pose.orientation.w = 0.5
         navigator.setInitialPose(initial_pose)
 
         # Activate navigation, if not autostarted. This should be called after setInitialPose()
