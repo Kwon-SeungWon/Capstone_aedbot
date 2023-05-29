@@ -168,7 +168,7 @@ class BasicNavigator(Node):
         send_goal_future = self.follow_waypoints_client.send_goal_async(
             goal_msg, self._feedbackCallback
         )
-        rclpy.spin_until_future_complete(self, send_goal_future)
+        rclpy.spin_until_future_complete(self, send_goal_future, timeout_sec=10)
         self.goal_handle = send_goal_future.result()
 
         if not self.goal_handle.accepted:

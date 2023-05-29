@@ -68,7 +68,7 @@ class Sub_dest_val_Go_to_Destination(Node):
         # Activate navigation, if not autostarted. This should be called after setInitialPose()
         # or this will initialize at the origin of the map and update the costmap with bogus readings.
         # If autostart, you should `waitUntilNav2Active()` instead.
-        # navigator.lifecycleStartup()
+        #navigator.lifecycleStartup()
 
         # Wait for navigation to fully activate. Use this line if autostart is set to true.
         navigator.waitUntilNav2Active()
@@ -77,7 +77,7 @@ class Sub_dest_val_Go_to_Destination(Node):
         # navigator.changeMap('/path/to/map.yaml')
 
         # You may use the navigator to clear or obtain costmaps
-        # navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
+        #navigator.clearAllCostmaps()  # also have clearLocalCostmap() and clearGlobalCostmap()
         # global_costmap = navigator.getGlobalCostmap()
         # local_costmap = navigator.getLocalCostmap()
 
@@ -103,7 +103,8 @@ class Sub_dest_val_Go_to_Destination(Node):
         navigator.goToPose(goal_pose)
 
         i = 0
-
+        print(6)
+        print(navigator.isNavComplete())
         # Keep doing stuff as long as the robot is moving towards the goal
         while not navigator.isNavComplete():
             ################################################
@@ -111,6 +112,19 @@ class Sub_dest_val_Go_to_Destination(Node):
             # Implement some code here for your application!
             #
             ################################################
+            result = navigator.getResult()
+
+            if result == NavigationResult.SUCCEEDED:
+                print("Goal succeeded!")
+
+                msg = Bridge()
+                msg.nav2_to_bridge = True
+                self.publisher_.publish(msg)
+                requests.get("http://130.162.152.119/arrive")
+
+                print(msg)
+                navigator.lifecycleShutdown()
+                self.should_exit = True
             # navigator.clearCostmapsPeriodically(3)
             print("clear")
             # Do something with the feedback
@@ -158,6 +172,63 @@ class Sub_dest_val_Go_to_Destination(Node):
         else:
             print("Goal has an invalid return status!")
 
+        # while True:
+        #     result = navigator.getResult()
+        #     if result == NavigationResult.SUCCEEDED:
+        #         print("Goal succeeded!")
+        #         break
+        #     ################################################
+        #     #
+        #     # Implement some code here for your application!
+        #     #
+        #     ################################################
+        #     # navigator.clearCostmapsPeriodically(3)
+        #     print("clear")
+        #     # Do something with the feedback
+        #     i = i + 1
+        #     feedback = navigator.getFeedback()
+        #     if feedback and i % 5 == 0:
+        #         print(
+        #             "Distance remaining: "
+        #             + "{:.2f}".format(feedback.distance_remaining)
+        #             + " meters."
+        #         )
+
+        #         # Some navigation timeout to demo cancellation
+        #         if Duration.from_msg(feedback.navigation_time) > Duration(
+        #             seconds=600.0
+        #         ):
+        #             navigator.cancelNav()
+
+        #         # Some navigation request change to demo preemption
+        #         if Duration.from_msg(feedback.navigation_time) > Duration(
+        #             seconds=120.0
+        #         ):
+        #             goal_pose.pose.position.x = -3.0
+        #             navigator.goToPose(goal_pose)
+
+        # # Do something depending on the return code
+        # result = navigator.getResult()
+        # print(result)
+        # if result == NavigationResult.SUCCEEDED:
+        #     print("Goal succeeded!")
+
+        #     msg = Bridge()
+        #     msg.nav2_to_bridge = True
+        #     self.publisher_.publish(msg)
+        #     requests.get("http://130.162.152.119/arrive")
+
+        #     print(msg)
+        #     navigator.lifecycleShutdown()
+        #     self.should_exit = True
+
+        # elif result == NavigationResult.CANCELED:
+        #     print("Goal was canceled!")
+        # elif result == NavigationResult.FAILED:
+        #     print("Goal failed!")
+        # else:
+        #     print("Goal has an invalid return status!")
+        #print(result)
         # Shut down the ROS 2 Navigation Stack
 
 
@@ -230,7 +301,8 @@ class Go_to_Station(Node):
             navigator.goToPose(goal_pose)
 
             i = 0
-
+            print(6)
+            print(navigator.isNavComplete())
             # Keep doing stuff as long as the robot is moving towards the goal
             while not navigator.isNavComplete():
                 ################################################

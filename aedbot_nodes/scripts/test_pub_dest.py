@@ -12,10 +12,10 @@ KST = timezone("Asia/Seoul")
 
 
 def get_dest():
-    x = 2.0
-    y = 0.2
-    z = 0.0
-    w = 1.0
+    x = 0.0
+    y = -0.5
+    z = -0.7085
+    w = 0.705
 
     return x, y, z, w
 

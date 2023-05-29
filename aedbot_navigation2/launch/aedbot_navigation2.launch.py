@@ -59,8 +59,8 @@ def generate_launch_description():
         [
             nav2_launch,
             timer_action,
-            timer_action2
-            # timer_action3
+            #timer_action2,
+            #timer_action3
         ]
     )
 

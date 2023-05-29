@@ -84,6 +84,7 @@ install(PROGRAMS
   #scripts/pick_and_deliver.py
   scripts/robot_navigator.py
   scripts/go_to_goal.py
+  scripts/test.py
   #scripts/security_demo.py
   #scripts/waypoint_follower.py
   #scripts/battery_state/battery_state_pub.py
