@@ -63,6 +63,9 @@ def main():
             break
 
         if len(multiprocessing.active_children()) == 0:
+            proc_siren = multiprocessing.Process(
+                target=playsound.playsound, args=(SIREN_PATH, True)
+            )
             proc_siren.start()
 
         time.sleep(0.01)
@@ -103,6 +106,9 @@ def main():
             break
 
         if len(multiprocessing.active_children()) == 0:
+            proc_bpm = multiprocessing.Process(
+                target=playsound.playsound, args=(BPM_PATH, True)
+            )
             proc_bpm.start()
 
         time.sleep(0.01)

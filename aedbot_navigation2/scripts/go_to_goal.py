@@ -61,8 +61,8 @@ class Sub_dest_val_Go_to_Destination(Node):
         initial_pose.pose.position.z = 0.0
         initial_pose.pose.orientation.x = 0.0
         initial_pose.pose.orientation.y = 0.0
-        initial_pose.pose.orientation.z = -0.707
-        initial_pose.pose.orientation.w = 0.5
+        initial_pose.pose.orientation.z = -0.7085
+        initial_pose.pose.orientation.w = 0.705619
         navigator.setInitialPose(initial_pose)
 
         # Activate navigation, if not autostarted. This should be called after setInitialPose()
@@ -97,7 +97,7 @@ class Sub_dest_val_Go_to_Destination(Node):
         # path = navigator.getPath(initial_pose, goal_pose)
 
         # 주기적으로 코스트맵 클리어
-        navigator.clear_costmap_callback()
+        #navigator.clear_costmap_callback()
 
         # Go to the goal pose
         navigator.goToPose(goal_pose)
