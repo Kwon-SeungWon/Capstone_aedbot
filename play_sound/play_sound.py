@@ -71,27 +71,30 @@ def main():
         time.sleep(0.01)
 
     # os.system("pactl -- set-sink-volume 0 100%")
+    proc_facetime = subprocess.Popen(["firefox", FACETIME_URL, "--kiosk"])
 
     proc_arrive = multiprocessing.Process(
         target=playsound.playsound, args=(ARRIVE_PATH, True)
     )
     proc_arrive.start()
-    proc_arrive.join()
+    #proc_arrive.join()
+    time.sleep(6)
 
     proc_start_cpr = multiprocessing.Process(
         target=playsound.playsound, args=(START_CPR_PATH, True)
     )
     proc_start_cpr.start()
-    proc_start_cpr.join()
+    #proc_start_cpr.join()
+    time.sleep(3)
 
     proc_bpm = multiprocessing.Process(
         target=playsound.playsound, args=(BPM_PATH, True)
     )
     proc_bpm.start()
 
-    time.sleep(3)
+    #time.sleep(3)
     # launch firefox in a subprocess
-    proc_facetime = subprocess.Popen(["firefox", FACETIME_URL, "--kiosk"])
+    
 
     proc_cpr_finish = multiprocessing.Process(
         target=playsound.playsound, args=(FINISH_CPR_PATH, True)

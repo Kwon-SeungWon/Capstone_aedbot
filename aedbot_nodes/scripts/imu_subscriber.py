@@ -64,7 +64,7 @@ class ImuSubscriberNode(Node):
             self.i = 1
             count_msg.data = 0
 
-        if msg.linear_acceleration.z < 2:
+        if msg.linear_acceleration.z <3 :
             if self.i == 1:
                 count_msg.data = 3
                 self.get_logger().info("count:%d" % count_msg.data)
@@ -73,7 +73,7 @@ class ImuSubscriberNode(Node):
                 self.period +=1
                 self.count_sum+=count_msg.data
 
-        if 2<= msg.linear_acceleration.z < 5:
+        if 3<= msg.linear_acceleration.z < 5.5:
             if self.i == 1:
                 count_msg.data = 2
                 self.get_logger().info("count:%d" % count_msg.data)
@@ -82,7 +82,7 @@ class ImuSubscriberNode(Node):
                 self.period +=1
                 self.count_sum+=count_msg.data
 
-        if 5 <= msg.linear_acceleration.z < 6:
+        if 5.5 <= msg.linear_acceleration.z < 6.5:
             if self.i == 1:
                 count_msg.data = 1
                 self.get_logger().info("count:%d" % count_msg.data)
