@@ -33,19 +33,20 @@ class ImuSubscriberNode(Node):
         self.mean_count =0
         self.start_time = time.monotonic()
         self.elapsed_time = 0
+        self.recieve_result = 0
 
     def receiver_callback(self, msg: Bridge):
-        self.recieve_result = msg.arrive_destination
+        # self.recieve_result = msg.arrive_destination
 
-        if self.recieve_result == True:
+        if msg.arrive_destination == True:
+            self.recieve_result+=1
+            
+        if self.recieve_result>=1:
             print("Receive Complete")
             print(msg.arrive_destination)
 
             self.imu_subscriber_ = self.create_subscription(
                 Imu, "cpr_imu/data", self.imu_callback, 10)
-        
-        else:
-            rclpy.shutdown()
 
 
     def imu_callback(self, msg: Imu):
